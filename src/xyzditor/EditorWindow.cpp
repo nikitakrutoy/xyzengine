@@ -13,7 +13,7 @@
 
 EditorWindow::EditorWindow(RenderEngine* renderEngine, size_t width, size_t height) : m_pRenderEngine(renderEngine)
 {
-	SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+	SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 	m_SDL_Window = SDL_CreateWindow("SDL Ogre Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, window_flags);
 
 	m_GL_Context = SDL_GL_CreateContext(m_SDL_Window);
@@ -29,11 +29,11 @@ EditorWindow::EditorWindow(RenderEngine* renderEngine, size_t width, size_t heig
 	ImGui::StyleColorsDark();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-	ImGui_ImplSDL2_InitForSDLRenderer(m_SDL_Window);
-	ImGui_ImplSDLRenderer_Init(m_pSDLRenderer);
+	//ImGui_ImplSDL2_InitForSDLRenderer(m_SDL_Window);
+	//ImGui_ImplSDLRenderer_Init(m_pSDLRenderer);
 
-	//ImGui_ImplSDL2_InitForOpenGL(m_SDL_Window, m_GL_Context);
-	//bool f = ImGui_ImplOpenGL3_Init(SDL_GL_VERSION);
+	ImGui_ImplSDL2_InitForOpenGL(m_SDL_Window, m_GL_Context);
+	bool f = ImGui_ImplOpenGL3_Init(SDL_GL_VERSION);
 }
 
 void destroyAllAttachedMovableObjects(Ogre::SceneNode* node)
@@ -119,12 +119,12 @@ EditorWindow::~EditorWindow()
 
 void SceneTreeWindow::Update()
 {
-	//SDL_GL_MakeCurrent(m_SDL_Window, m_GL_Context);
 	ImGui::SetCurrentContext(m_pImGuiContext);
-	//ImGui_ImplOpenGL3_NewFrame();
-	//ImGui_ImplSDL2_NewFrame();
-	ImGui_ImplSDLRenderer_NewFrame();
-	ImGui_ImplSDL2_NewFrame(m_SDL_Window);
+	SDL_GL_MakeCurrent(m_SDL_Window, m_GL_Context);
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+	//ImGui_ImplSDLRenderer_NewFrame();
+	//ImGui_ImplSDL2_NewFrame(m_SDL_Window);
 	ImGui::NewFrame();
 
 	ImGui::Begin("Scene");
@@ -146,13 +146,14 @@ void SceneTreeWindow::Update()
 	ImGui::End();
 
 	ImGui::Render();
-	//ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-	SDL_SetRenderDrawColor(m_pSDLRenderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
-	SDL_RenderClear(m_pSDLRenderer);
-	ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-	//SwapFrames();
-	SDL_RenderPresent(m_pSDLRenderer);
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	SwapFrames();
+	//ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+	//SDL_SetRenderDrawColor(m_pSDLRenderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
+	//SDL_RenderClear(m_pSDLRenderer);
+	//ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+
+	//SDL_RenderPresent(m_pSDLRenderer);
 }
 
 void SceneTreeWindow::DrawSceneTree(Ogre::SceneNode* node)
@@ -179,12 +180,12 @@ void SceneTreeWindow::DrawSceneTree(Ogre::SceneNode* node)
 
 void GameObjectEditor::Update()
 {
-	//SDL_GL_MakeCurrent(m_SDL_Window, m_GL_Context);
 	ImGui::SetCurrentContext(m_pImGuiContext);
-	//ImGui_ImplOpenGL3_NewFrame();
-	//ImGui_ImplSDL2_NewFrame();
-	ImGui_ImplSDLRenderer_NewFrame();
-	ImGui_ImplSDL2_NewFrame(m_SDL_Window);
+	SDL_GL_MakeCurrent(m_SDL_Window, m_GL_Context);
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+	//ImGui_ImplSDLRenderer_NewFrame();
+	//ImGui_ImplSDL2_NewFrame(m_SDL_Window);
 	ImGui::NewFrame();
 
 	auto node = m_pSelectedNode;
@@ -238,8 +239,6 @@ void GameObjectEditor::Update()
 				ImGui::EndCombo();
 			}
 		}
-
-
 		ImGui::End();
 	}
 
@@ -247,13 +246,14 @@ void GameObjectEditor::Update()
 	ImGui::ShowDemoWindow(&f);
 
 	ImGui::Render();
-	//ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-	SDL_SetRenderDrawColor(m_pSDLRenderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
-	SDL_RenderClear(m_pSDLRenderer);
-	ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-	//SwapFrames();
-	SDL_RenderPresent(m_pSDLRenderer);
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	SwapFrames();
+	//ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+	//SDL_SetRenderDrawColor(m_pSDLRenderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
+	//SDL_RenderClear(m_pSDLRenderer);
+	//ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+
+	//SDL_RenderPresent(m_pSDLRenderer);
 }
 
 void GameObjectEditor::SetSelected(Ogre::SceneNode* node)
