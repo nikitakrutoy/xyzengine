@@ -150,13 +150,17 @@ void RenderEngine::RT_LoadOgreHead()
 	Ogre::v1::MeshPtr v1Mesh;
 	Ogre::MeshPtr v2Mesh;
 
+
 	v1Mesh = Ogre::v1::MeshManager::getSingleton().load(
 		"ogrehead.mesh", Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
 		Ogre::v1::HardwareBuffer::HBU_STATIC, Ogre::v1::HardwareBuffer::HBU_STATIC);
 
+
+
+
 	//Create a v2 mesh to import to, with a different name (arbitrary).
 	v2Mesh = Ogre::MeshManager::getSingleton().createManual(
-		"ogrehead.mesh Imported", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		"ogrehead.mesh_imported", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
 	bool halfPosition = true;
 	bool halfUVs = true;
@@ -172,10 +176,11 @@ void RenderEngine::RT_LoadOgreHead()
 	//Create an Item with the model we just imported.
 	//Notice we use the name of the imported model. We could also use the overload
 	//with the mesh pointer:
-	Ogre::Item* item = m_pSceneManager->createItem("ogrehead.mesh Imported",
+	Ogre::Item* item = m_pSceneManager->createItem("ogrehead.mesh_imported",
 		Ogre::ResourceGroupManager::
 		AUTODETECT_RESOURCE_GROUP_NAME,
 		Ogre::SCENE_DYNAMIC);
+	item->setName("ogrehead.mesh");
 	Ogre::SceneNode* sceneNode = m_pSceneManager->getRootSceneNode(Ogre::SCENE_DYNAMIC)->
 		createChildSceneNode(Ogre::SCENE_DYNAMIC);
 	sceneNode->attachObject(item);

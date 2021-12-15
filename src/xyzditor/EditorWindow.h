@@ -49,18 +49,13 @@ public:
 	GameObjectEditor(RenderEngine* renderEngine, size_t width = 200, size_t height = 500) : EditorWindow(renderEngine, width, height) {};
 	~GameObjectEditor() {};
 	void Update() override;
-	void SetSelected(Ogre::SceneNode* node) { 
-		if (node == m_pSelectedNode) return;
-		m_pSelectedNode = node; 
-		if (node) {
-			memset(objectName, 0, 128);
-			strncpy(objectName, node->getName().c_str(), node->getName().length());
-		}
-	}
+	void SetSelected(Ogre::SceneNode* node);
 
 private:
 	Ogre::SceneNode* m_pSelectedNode = nullptr;
 	char objectName[128];
+	std::string meshName;
+	std::string objectType;
 };
 
 

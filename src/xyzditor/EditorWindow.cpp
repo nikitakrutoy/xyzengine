@@ -6,6 +6,10 @@
 #include "imgui_impl_sdl.h"
 #include "Common.h"
 #include "OgreItem.h"
+#include "OgreMesh2.h"
+#include "OgreMeshManager2.h"
+
+#include <filesystem>
 
 EditorWindow::EditorWindow(RenderEngine* renderEngine, size_t width, size_t height) : m_pRenderEngine(renderEngine)
 {
@@ -52,12 +56,59 @@ void destroyAllAttachedMovableObjects(Ogre::SceneNode* node)
 	}
 }
 
+void destroyAttachedItem(Ogre::SceneNode* node)
+{
+	if (!node) return;
+
+	// Destroy all the attached objects
+	Ogre::SceneNode::ObjectIterator itObject = node->getAttachedObjectIterator();
+
+	while (itObject.hasMoreElements())
+		node->getCreator()->destroyMovableObject(itObject.getNext());
+}
+
 void destroySceneNode(Ogre::SceneNode* node)
 {
 	if (!node) return;
 	destroyAllAttachedMovableObjects(node);
 	node->removeAndDestroyAllChildren();
 	node->getCreator()->destroySceneNode(node);
+}
+
+Ogre::Item* loadMesh(std::string name, Ogre::SceneManager* mgr) {
+
+	Ogre::Item* item;
+	try {
+		item = mgr->createItem(name,
+			Ogre::ResourceGroupManager::
+			AUTODETECT_RESOURCE_GROUP_NAME,
+			Ogre::SCENE_DYNAMIC);
+		item->setName(name);
+		return item;
+	}
+	catch (const std::exception& e) {
+		Ogre::v1::MeshPtr v1Mesh;
+		Ogre::MeshPtr v2Mesh;
+		if (Ogre::MeshManager::getSingleton().getByName(name + "_imported").isNull()) {
+			v1Mesh = Ogre::v1::MeshManager::getSingleton().load(
+				name, Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+				Ogre::v1::HardwareBuffer::HBU_STATIC, Ogre::v1::HardwareBuffer::HBU_STATIC);
+			v2Mesh = Ogre::MeshManager::getSingleton().createManual(
+				name + "_imported", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+			bool halfPosition = true;
+			bool halfUVs = true;
+			bool useQtangents = true;
+			v2Mesh->importV1(v1Mesh.get(), halfPosition, halfUVs, useQtangents);
+			v1Mesh->unload();
+		}
+		item = mgr->createItem(name + "_imported",
+			Ogre::ResourceGroupManager::
+			AUTODETECT_RESOURCE_GROUP_NAME,
+			Ogre::SCENE_DYNAMIC);
+		item->setName(name);
+		return item;
+
+	}
 }
 
 EditorWindow::~EditorWindow()
@@ -89,7 +140,7 @@ void SceneTreeWindow::Update()
 			sceneNode->attachObject(item);
 			sceneNode->scale(1.f, 1.0f, 1.0f);
 			sceneNode->setName("Ogre1");
-			});
+		});
 	}
 	DrawSceneTree(m_pRenderEngine->GetSceneManager()->getRootSceneNode());
 	ImGui::End();
@@ -162,8 +213,38 @@ void GameObjectEditor::Update()
 			node->setScale(scale);
 		});
 
+		std::string path = "../../";
+		for (const auto& entry : std::filesystem::directory_iterator(path))
+			path = entry.path().filename().string();
+
+		ImGui::Text("Object Type"); ImGui::SameLine(); ImGui::Text(objectType.c_str());
+
+		auto models = Ogre::ResourceGroupManager::getSingleton().listResourceNames("Models");
+		if (objectType == "Item") {
+			int flags = 0;
+			if (ImGui::BeginCombo("Model", meshName.c_str(), flags))
+			{
+				for (int n = 0; n < models->size(); n++)
+				{
+					std::string selectedMeshName = models->at(n);
+					if (ImGui::Selectable(selectedMeshName.c_str())) {
+						m_pRenderEngine->GetRT()->RC_LambdaAction([selectedMeshName, node, mgr = m_pRenderEngine->GetSceneManager()]{
+							destroyAttachedItem(node);
+							node->attachObject(loadMesh(selectedMeshName, mgr.get()));
+						});
+						meshName = selectedMeshName;
+					}
+				}
+				ImGui::EndCombo();
+			}
+		}
+
+
 		ImGui::End();
 	}
+
+	bool f = true;
+	ImGui::ShowDemoWindow(&f);
 
 	ImGui::Render();
 	//ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -173,4 +254,23 @@ void GameObjectEditor::Update()
 	ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
 	//SwapFrames();
 	SDL_RenderPresent(m_pSDLRenderer);
+}
+
+void GameObjectEditor::SetSelected(Ogre::SceneNode* node)
+{
+	if (node == m_pSelectedNode) return;
+	m_pSelectedNode = node;
+	if (node) {
+		memset(objectName, 0, 128);
+		strncpy(objectName, node->getName().c_str(), node->getName().length());
+		auto objects = node->getAttachedObjectIterator();
+		while (objects.hasMoreElements()) {
+			auto obj = objects.getNext();
+			objectType = obj->getMovableType();
+			if (objectType == "Item") {
+				auto item = dynamic_cast<Ogre::Item*>(obj);
+				meshName = item->getMesh().get()->getName();
+			}
+		}
+	}
 }
