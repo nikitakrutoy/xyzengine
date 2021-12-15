@@ -42,6 +42,7 @@ public:
 
 	Ogre::SceneNode* GetRootNode() { return m_pSceneManager->getRootSceneNode(); };
 	std::shared_ptr<Ogre::SceneManager> GetSceneManager() { return m_pSceneManager; };
+	SDL_Window* GetWindow() { return m_SDL_Window; };
 
 	RenderThread* GetRT() const { return m_pRT.get(); }
 

@@ -115,11 +115,12 @@ void RenderEngine::RT_Init()
 void RenderEngine::RT_SetupDefaultCamera()
 {
 	m_pCamera = std::unique_ptr<Ogre::Camera>(m_pSceneManager->createCamera("Main Camera"));
-	m_pCamera->setPosition(Ogre::Vector3(150, 150, 150));
+	m_pCamera->setPosition(Ogre::Vector3(150, 0, 0));
 	m_pCamera->lookAt(Ogre::Vector3(0, 0, 0));
 	m_pCamera->setNearClipDistance(0.2f);
 	m_pCamera->setFarClipDistance(1000.0f);
 	m_pCamera->setAutoAspectRatio(true);
+	m_pCamera->setFixedYawAxis(true);
 }
 
 void RenderEngine::RT_SetupDefaultCompositor()
@@ -210,7 +211,7 @@ void RenderEngine::RT_InitSDL()
 {
 	m_GL_Context = SDL_GL_CreateContext(m_SDL_Window);
 	SDL_GL_MakeCurrent(m_SDL_Window, m_GL_Context);
-	SDL_GL_SetSwapInterval(0.5);
+	SDL_GL_SetSwapInterval(0);
 }
 
 void RenderEngine::RT_SDLClenup()
