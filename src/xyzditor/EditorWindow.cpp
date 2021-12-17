@@ -5,16 +5,15 @@
 #include "imgui_impl_sdlrenderer.h"
 #include "imgui_impl_sdl.h"
 #include "Common.h"
-#include "OgreItem.h"
-#include "OgreMesh2.h"
-#include "OgreMeshManager2.h"
+#include "OgreUtils.h"
+#include "SceneLoader.h"
 
 #include <filesystem>
 
-EditorWindow::EditorWindow(RenderEngine* renderEngine, size_t width, size_t height) : m_pRenderEngine(renderEngine)
+EditorWindow::EditorWindow(RenderEngine* renderEngine, std::string name, size_t width, size_t height) : m_pRenderEngine(renderEngine)
 {
 	SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-	m_SDL_Window = SDL_CreateWindow("SDL Ogre Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, window_flags);
+	m_SDL_Window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, window_flags);
 
 	m_GL_Context = SDL_GL_CreateContext(m_SDL_Window);
 	SDL_GL_MakeCurrent(m_SDL_Window, m_GL_Context);
@@ -36,80 +35,6 @@ EditorWindow::EditorWindow(RenderEngine* renderEngine, size_t width, size_t heig
 	bool f = ImGui_ImplOpenGL3_Init(SDL_GL_VERSION);
 }
 
-void destroyAllAttachedMovableObjects(Ogre::SceneNode* node)
-{
-	if (!node) return;
-
-	// Destroy all the attached objects
-	Ogre::SceneNode::ObjectIterator itObject = node->getAttachedObjectIterator();
-
-	while (itObject.hasMoreElements())
-		node->getCreator()->destroyMovableObject(itObject.getNext());
-
-	// Recurse to child SceneNodes
-	Ogre::SceneNode::NodeVecIterator itChild = node->getChildIterator();
-
-	while (itChild.hasMoreElements())
-	{
-		Ogre::SceneNode* pChildNode = static_cast<Ogre::SceneNode*>(itChild.getNext());
-		destroyAllAttachedMovableObjects(pChildNode);
-	}
-}
-
-void destroyAttachedItem(Ogre::SceneNode* node)
-{
-	if (!node) return;
-
-	// Destroy all the attached objects
-	Ogre::SceneNode::ObjectIterator itObject = node->getAttachedObjectIterator();
-
-	while (itObject.hasMoreElements())
-		node->getCreator()->destroyMovableObject(itObject.getNext());
-}
-
-void destroySceneNode(Ogre::SceneNode* node)
-{
-	if (!node) return;
-	destroyAllAttachedMovableObjects(node);
-	node->removeAndDestroyAllChildren();
-	node->getCreator()->destroySceneNode(node);
-}
-
-Ogre::Item* loadMesh(std::string name, Ogre::SceneManager* mgr) {
-
-	Ogre::Item* item;
-	try {
-		item = mgr->createItem(name,
-			Ogre::ResourceGroupManager::
-			AUTODETECT_RESOURCE_GROUP_NAME,
-			Ogre::SCENE_DYNAMIC);
-		item->setName(name);
-		return item;
-	}
-	catch (const std::exception& e) {
-		Ogre::v1::MeshPtr v1Mesh;
-		Ogre::MeshPtr v2Mesh;
-		if (Ogre::MeshManager::getSingleton().getByName(name + "_imported").isNull()) {
-			v1Mesh = Ogre::v1::MeshManager::getSingleton().load(
-				name, Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
-				Ogre::v1::HardwareBuffer::HBU_STATIC, Ogre::v1::HardwareBuffer::HBU_STATIC);
-			v2Mesh = Ogre::MeshManager::getSingleton().createManual(
-				name + "_imported", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-			bool halfPosition = true;
-			bool halfUVs = true;
-			bool useQtangents = true;
-			v2Mesh->importV1(v1Mesh.get(), halfPosition, halfUVs, useQtangents);
-			v1Mesh->unload();
-		}
-		item = mgr->createItem(name + "_imported",
-			Ogre::ResourceGroupManager::
-			AUTODETECT_RESOURCE_GROUP_NAME,
-			Ogre::SCENE_DYNAMIC);
-		item->setName(name);
-		return item;
-
-	}
-}
 
 EditorWindow::~EditorWindow()
 {
@@ -126,24 +51,44 @@ void SceneTreeWindow::Update()
 	//ImGui_ImplSDLRenderer_NewFrame();
 	//ImGui_ImplSDL2_NewFrame(m_SDL_Window);
 	ImGui::NewFrame();
-
-	ImGui::Begin("Scene");
-	if (ImGui::Button("Add", ImVec2(100, 20)))
 	{
+		bool f = true;
+		ImGui::ShowDemoWindow(&f);
+		ImGui::Begin("Scene");
 
-		m_pRenderEngine->GetRT()->RC_LambdaAction([mgr = m_pRenderEngine->GetSceneManager()] {
-			Ogre::Item* item = mgr->createItem("ogrehead.mesh Imported",
-				Ogre::ResourceGroupManager::
-				AUTODETECT_RESOURCE_GROUP_NAME,
-				Ogre::SCENE_DYNAMIC);
-			Ogre::SceneNode* sceneNode = mgr->getRootSceneNode(Ogre::SCENE_DYNAMIC)->createChildSceneNode(Ogre::SCENE_DYNAMIC);
-			sceneNode->attachObject(item);
-			sceneNode->scale(1.f, 1.0f, 1.0f);
-			sceneNode->setName("Ogre1");
-		});
+
+		ImGui::InputText("Scene name", sceneName, IM_ARRAYSIZE(sceneName));
+		if (ImGui::Button("Save", ImVec2(100, 20))) {
+			auto scenePath = Ogre::ResourceGroupManager::getSingleton().listResourceLocations("Scenes")->at(0);
+			scenePath += "/" + std::string(sceneName);
+			SceneLoader::StoreXML(m_pRenderEngine->GetSceneManager().get(), scenePath);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Load", ImVec2(100, 20))) {
+			m_pSelectedNode = nullptr;
+			auto scenePath = Ogre::ResourceGroupManager::getSingleton().listResourceLocations("Scenes")->at(0);
+			scenePath += "/" + std::string(sceneName);
+			m_pRenderEngine->GetRT()->RC_LambdaAction([re = m_pRenderEngine, scenePath] {
+				SceneLoader::LoadXML(re->GetSceneManager().get(), scenePath);
+				});
+		}
+
+		if (ImGui::Button("Add", ImVec2(100, 20)))
+		{
+			m_pRenderEngine->GetRT()->RC_LambdaAction([mgr = m_pRenderEngine->GetSceneManager()]{
+				Ogre::Item * item = mgr->createItem("ogrehead.mesh",
+					Ogre::ResourceGroupManager::
+					AUTODETECT_RESOURCE_GROUP_NAME,
+					Ogre::SCENE_DYNAMIC);
+				Ogre::SceneNode * sceneNode = mgr->getRootSceneNode(Ogre::SCENE_DYNAMIC)->createChildSceneNode(Ogre::SCENE_DYNAMIC);
+				sceneNode->attachObject(item);
+				sceneNode->scale(1.f, 1.0f, 1.0f);
+				sceneNode->setName("Default");
+				});
+		}
+		DrawSceneTree(m_pRenderEngine->GetSceneManager()->getRootSceneNode());
+		ImGui::End();
 	}
-	DrawSceneTree(m_pRenderEngine->GetSceneManager()->getRootSceneNode());
-	ImGui::End();
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -169,7 +114,7 @@ void SceneTreeWindow::DrawSceneTree(Ogre::SceneNode* node)
 				if (m_pSelectedNode == child)
 					m_pSelectedNode = nullptr;
 				m_pRenderEngine->GetRT()->RC_LambdaAction([child] {
-					destroySceneNode(child);
+					OgreUtils::destroySceneNode(child);
 				});
 			}
 			DrawSceneTree(child);
@@ -189,10 +134,8 @@ void GameObjectEditor::Update()
 	ImGui::NewFrame();
 
 	auto node = m_pSelectedNode;
+	ImGui::Begin("Edit object");
 	if (node) {
-		ImGui::Begin("Edit object");
-
-
 		ImGui::InputText("Name", objectName, IM_ARRAYSIZE(objectName));
 		ImGui::SameLine();
 		if (ImGui::Button("Rename", ImVec2(100, 20)))
@@ -214,10 +157,6 @@ void GameObjectEditor::Update()
 			node->setScale(scale);
 		});
 
-		std::string path = "../../";
-		for (const auto& entry : std::filesystem::directory_iterator(path))
-			path = entry.path().filename().string();
-
 		ImGui::Text("Object Type"); ImGui::SameLine(); ImGui::Text(objectType.c_str());
 
 		auto models = Ogre::ResourceGroupManager::getSingleton().listResourceNames("Models");
@@ -230,8 +169,8 @@ void GameObjectEditor::Update()
 					std::string selectedMeshName = models->at(n);
 					if (ImGui::Selectable(selectedMeshName.c_str())) {
 						m_pRenderEngine->GetRT()->RC_LambdaAction([selectedMeshName, node, mgr = m_pRenderEngine->GetSceneManager()]{
-							destroyAttachedItem(node);
-							node->attachObject(loadMesh(selectedMeshName, mgr.get()));
+							OgreUtils::destroyAttachedItem(node);
+							node->attachObject(OgreUtils::loadMesh(selectedMeshName, mgr.get()));
 						});
 						meshName = selectedMeshName;
 					}
@@ -239,11 +178,11 @@ void GameObjectEditor::Update()
 				ImGui::EndCombo();
 			}
 		}
-		ImGui::End();
 	}
-
-	bool f = true;
-	ImGui::ShowDemoWindow(&f);
+	else {
+		ImGui::Text("Select Node in Scene Tree");
+	}
+	ImGui::End();
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

@@ -2,3 +2,5 @@
 /libs
 /bin
 /Media
+/src/xyzditor/x64
+*.glsl

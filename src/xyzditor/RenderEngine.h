@@ -59,6 +59,7 @@ private:
 	void RT_SetupDefaultCamera();
 	void RT_SetupDefaultCompositor();
 	void RT_LoadDefaultResources();
+	void RT_LoadDefaultScene();
 	void RT_LoadOgreHead();
 	void RT_SetupDefaultLight();
 	void RT_EndInit();

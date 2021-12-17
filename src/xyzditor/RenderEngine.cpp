@@ -5,6 +5,7 @@
 #include "OgreMeshManager2.h"
 #include "OgreMesh2.h"
 #include "OgreItem.h"
+#include "SceneLoader.h"
 
 RenderEngine::RenderEngine(ResourceManager* pResourceManager) :
 	m_pRoot(nullptr),
@@ -27,8 +28,7 @@ RenderEngine::RenderEngine(ResourceManager* pResourceManager) :
 		RT_SetupDefaultCamera();
 		RT_SetupDefaultCompositor();
 		RT_LoadDefaultResources();
-		RT_SetupDefaultLight();
-		RT_LoadOgreHead();
+		RT_LoadDefaultScene();
 		RT_EndInit();
 	});
 
@@ -143,6 +143,12 @@ void RenderEngine::RT_LoadDefaultResources()
 	m_pResourceManager->LoadOgreResources("resources.cfg");
 }
 
+void RenderEngine::RT_LoadDefaultScene() {
+	auto scenesPath = Ogre::ResourceGroupManager::getSingleton().listResourceLocations("Scenes")->at(0);
+	scenesPath += "/default.json";
+	SceneLoader::LoadXML(m_pSceneManager.get(), scenesPath);
+}
+
 void RenderEngine::RT_LoadOgreHead()
 {
 	//Load the v1 mesh. Notice the v1 namespace
@@ -156,12 +162,9 @@ void RenderEngine::RT_LoadOgreHead()
 		"ogrehead.mesh", Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
 		Ogre::v1::HardwareBuffer::HBU_STATIC, Ogre::v1::HardwareBuffer::HBU_STATIC);
 
-
-
-
 	//Create a v2 mesh to import to, with a different name (arbitrary).
 	v2Mesh = Ogre::MeshManager::getSingleton().createManual(
-		"ogrehead.mesh_imported", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		"ogrehead.mesh", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
 	bool halfPosition = true;
 	bool halfUVs = true;
@@ -177,7 +180,7 @@ void RenderEngine::RT_LoadOgreHead()
 	//Create an Item with the model we just imported.
 	//Notice we use the name of the imported model. We could also use the overload
 	//with the mesh pointer:
-	Ogre::Item* item = m_pSceneManager->createItem("ogrehead.mesh_imported",
+	Ogre::Item* item = m_pSceneManager->createItem("ogrehead.mesh",
 		Ogre::ResourceGroupManager::
 		AUTODETECT_RESOURCE_GROUP_NAME,
 		Ogre::SCENE_DYNAMIC);

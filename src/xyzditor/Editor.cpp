@@ -1,5 +1,6 @@
 #include "Editor.h"
 #include "Common.h"
+#include "SceneLoader.h"
 
 Editor::Editor()
 {
@@ -40,7 +41,13 @@ void Editor::Run()
 	Uint64 NOW = SDL_GetPerformanceCounter();
 	Uint64 LAST = 0;
 	double deltaTime = 0;
-	double speed = 100;
+	double speed = 1000;
+	
+	SDL_SysWMinfo info;
+	SDL_VERSION(&info.version);
+	SDL_GetWindowWMInfo(m_pRenderEngine->GetWindow(), &info);
+	MessageBox(info.info.win.window, L"Hello", L"Caption", MB_OKCANCEL);
+
 	while (true)
 	{
 		LAST = NOW;
@@ -51,7 +58,7 @@ void Editor::Run()
 
 		m_pRenderEngine->GetRT()->RC_BeginFrame();
 
-		m_pInputHandler->Update(m_pRenderEngine->GetWindow(), deltaTime);
+		m_pInputHandler->Update(m_pRenderEngine->GetWindow(), m_pWindowsManager->GetWindows(), deltaTime);
 		m_pWindowsManager->Update();
 
 		m_pRenderEngine->GetMainCamera();

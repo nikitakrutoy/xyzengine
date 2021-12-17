@@ -79,7 +79,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)\..\bin\$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)\..\libs\Ogre\include\OGRE;$(SolutionDir)\..\libs\Ogre\include\OGRE\Hlms\Common;$(SolutionDir)\..\libs\SDL2\include;$(SolutionDir)\..\libs\imgui\;$(SolutionDir)\..\libs\imgui\backends\;$(SolutionDir)\..\libs\Ogre\include\OGRE\RenderSystems\GL3PLus</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)\..\libs\Ogre\include\OGRE;$(SolutionDir)\..\libs\Ogre\include\OGRE\Hlms\Common;$(SolutionDir)\..\libs\SDL2\include;$(SolutionDir)\..\libs\imgui\;$(SolutionDir)\..\libs\imgui\backends\;$(SolutionDir)\..\libs\Ogre\include\OGRE\RenderSystems\GL3PLus;$(SolutionDir)\..\libs\json\single_include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -154,13 +154,18 @@
     <ClInclude Include="..\..\libs\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\..\libs\imgui\imstb_textedit.h" />
     <ClInclude Include="..\..\libs\imgui\imstb_truetype.h" />
+    <ClInclude Include="..\..\libs\json\single_include\nlohmann\json.hpp" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="EditorWindow.h" />
     <ClInclude Include="InputHandler.h" />
+    <ClInclude Include="OgreUtils.h" />
     <ClInclude Include="RenderEngine.h" />
     <ClInclude Include="RenderThread.h" />
     <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="Scancodes.h" />
+    <ClInclude Include="SceneLoader.h" />
+    <ClInclude Include="Timer.h" />
     <ClInclude Include="WindowsManager.h" />
   </ItemGroup>
   <ItemGroup>
@@ -176,9 +181,12 @@
     <ClCompile Include="EditorWindow.cpp" />
     <ClCompile Include="InputHandler.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="OgreUtils.cpp" />
     <ClCompile Include="RenderEngine.cpp" />
     <ClCompile Include="RenderThread.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="SceneLoader.cpp" />
+    <ClCompile Include="Timer.cpp" />
     <ClCompile Include="WindowsManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -5,8 +5,8 @@
 
 WindowsManager::WindowsManager(RenderEngine* renderEngine)
 {
-	m_pSceneTreeWindow = new SceneTreeWindow(renderEngine);
-	m_pGameObjectEditor = new GameObjectEditor(renderEngine);
+	m_pGameObjectEditor = new GameObjectEditor(renderEngine, "Property Editor");
+	m_pSceneTreeWindow = new SceneTreeWindow(renderEngine, "Scene Tree");
 }
 
 void WindowsManager::Update()
