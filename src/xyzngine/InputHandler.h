@@ -3,7 +3,6 @@
 #include <map>
 #include <vector>
 #include <SDL.h>
-#include "EditorWindow.h"
 
 
 
@@ -12,7 +11,7 @@ class InputHandler
 public:
 	InputHandler(std::string path);
 
-	void Update(SDL_Window* window, std::vector<EditorWindow*> editorWindows, float deltaTime);
+	void Update(SDL_Window* window, float deltaTime);
 
 	bool Get(SDL_Keycode key) { return m_keyState.find(key) != m_keyState.end() ? m_keyState[key] : false; }
 	bool GetMouse(int key) { return m_mouseState.find(key) != m_mouseState.end() ? m_mouseState[key] : false; }

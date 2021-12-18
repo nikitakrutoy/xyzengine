@@ -1,9 +1,8 @@
 #include "InputHandler.h"
 #include <algorithm>
-#include <OgreConfigFile.h>
 
-#include "imgui_impl_sdl.h"
 #include "Ogre.h"
+#include "OgreConfigFile.h"
 
 
 InputHandler::InputHandler(std::string path)
@@ -35,7 +34,7 @@ InputHandler::InputHandler(std::string path)
 
 }
 
-void InputHandler::Update(SDL_Window* window, std::vector<EditorWindow*> editorWindows, float deltaTime)
+void InputHandler::Update(SDL_Window* window, float deltaTime)
 {
 	SDL_Event ev;
 	SDL_Keycode key;
@@ -45,13 +44,6 @@ void InputHandler::Update(SDL_Window* window, std::vector<EditorWindow*> editorW
 	mouseDiffY = 0.f;
 	while (SDL_PollEvent(&ev))
 	{
-		for (auto w : editorWindows) {
-			if (ev.window.windowID == SDL_GetWindowID(w->GetWindow())) {
-				w->SetImguiContext();
-				ImGui_ImplSDL2_ProcessEvent(&ev);
-				break;
-			}
-		}
 		
 		if (ev.window.windowID != SDL_GetWindowID(window)) continue;
 		if (ev.window.event == SDL_WINDOWEVENT_CLOSE) m_exit = true;

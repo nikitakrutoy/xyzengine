@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{12b7c091-87bc-4a35-9ca0-debb6cb75ef2}</ProjectGuid>
-    <RootNamespace>xyzditor</RootNamespace>
+    <ProjectGuid>{bcc0369d-60b2-49b5-af98-2861ad3f3d12}</ProjectGuid>
+    <RootNamespace>xyzngine</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -40,7 +40,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -78,8 +78,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)\..\libs\SDL2\include;$(SolutionDir)\..\libs\json\single_include;$(SolutionDir)\..\libs\Ogre\include\OGRE;$(SolutionDir)\..\libs\Ogre\include\OGRE\Hlms\Common;$(SolutionDir)\..\src\xyzender\</IncludePath>
     <OutDir>$(SolutionDir)\..\bin\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)\..\libs\Ogre\include\OGRE;$(SolutionDir)\..\libs\Ogre\include\OGRE\Hlms\Common;$(SolutionDir)\..\libs\SDL2\include;$(SolutionDir)\..\libs\imgui\;$(SolutionDir)\..\libs\imgui\backends\;$(SolutionDir)\..\src\xyzender;$(SolutionDir)\..\src\xyzngine;$(SolutionDir)\..\libs\gl3w\include;$(SolutionDir)\..\libs\json\single_include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -121,10 +121,10 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\..\libs\Ogre\lib\Debug;$(SolutionDir)\..\libs\SDL2\VisualC\x64\Release;$(SolutionDir)\..\bin\xyzngine\x64\Debug;$(SolutionDir)\..\bin\xyzender\x64\Debug</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OgreMain_d.lib;RenderSystem_Direct3D11_d.lib;RenderSystem_GL3Plus_d.lib;OgreHlmsPbs_d.lib;OgreHlmsUnlit_d.lib;OgreMeshLodGenerator_d.lib;OgreSceneFormat_d.lib;SDL2.lib;xyzender.lib;xyzngine.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\libs\Ogre\lib\Debug;$(SolutionDir)\..\libs\SDL2\VisualC\x64\Release</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OgreMain_d.lib;OgreSceneFormat_d.lib;OgreHlmsPbs_d.lib;OgreHlmsUnlit_d.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -144,34 +144,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\libs\imgui\backends\imgui_impl_opengl3.h" />
-    <ClInclude Include="..\..\libs\imgui\backends\imgui_impl_opengl3_loader.h" />
-    <ClInclude Include="..\..\libs\imgui\backends\imgui_impl_sdl.h" />
-    <ClInclude Include="..\..\libs\imgui\backends\imgui_impl_sdlrenderer.h" />
-    <ClInclude Include="..\..\libs\imgui\imconfig.h" />
-    <ClInclude Include="..\..\libs\imgui\imgui.h" />
-    <ClInclude Include="..\..\libs\imgui\imgui_internal.h" />
-    <ClInclude Include="..\..\libs\imgui\imstb_rectpack.h" />
-    <ClInclude Include="..\..\libs\imgui\imstb_textedit.h" />
-    <ClInclude Include="..\..\libs\imgui\imstb_truetype.h" />
-    <ClInclude Include="Common.h" />
-    <ClInclude Include="Editor.h" />
-    <ClInclude Include="EditorWindow.h" />
-    <ClInclude Include="WindowsManager.h" />
+    <ClInclude Include="..\..\libs\json\single_include\nlohmann\json.hpp" />
+    <ClInclude Include="InputHandler.h" />
+    <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="Scancodes.h" />
+    <ClInclude Include="SceneLoader.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\libs\imgui\backends\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="..\..\libs\imgui\backends\imgui_impl_sdl.cpp" />
-    <ClCompile Include="..\..\libs\imgui\backends\imgui_impl_sdlrenderer.cpp" />
-    <ClCompile Include="..\..\libs\imgui\imgui.cpp" />
-    <ClCompile Include="..\..\libs\imgui\imgui_demo.cpp" />
-    <ClCompile Include="..\..\libs\imgui\imgui_draw.cpp" />
-    <ClCompile Include="..\..\libs\imgui\imgui_tables.cpp" />
-    <ClCompile Include="..\..\libs\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="Editor.cpp" />
-    <ClCompile Include="EditorWindow.cpp" />
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="WindowsManager.cpp" />
+    <ClCompile Include="InputHandler.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="SceneLoader.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

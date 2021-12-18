@@ -2,6 +2,11 @@
 #include "Common.h"
 #include "SceneLoader.h"
 
+#include "Ogre.h"
+
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_opengl3.h"
+
 Editor::Editor()
 {
 	// GL 3.0 + GLSL 130
@@ -57,8 +62,8 @@ void Editor::Run()
 		
 
 		m_pRenderEngine->GetRT()->RC_BeginFrame();
-
-		m_pInputHandler->Update(m_pRenderEngine->GetWindow(), m_pWindowsManager->GetWindows(), deltaTime);
+		m_pWindowsManager->ProcessInput();
+		m_pInputHandler->Update(m_pRenderEngine->GetWindow(), deltaTime);
 		m_pWindowsManager->Update();
 
 		m_pRenderEngine->GetMainCamera();

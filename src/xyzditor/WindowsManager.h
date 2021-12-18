@@ -1,11 +1,13 @@
 #pragma once
 #include "EditorWindow.h"
 #include "RenderEngine.h"
+#include <vector>
 class WindowsManager
 {
 public:
 	WindowsManager(RenderEngine* renderEngine);
 	void Update();
+	void ProcessInput();
 	std::vector<EditorWindow*> GetWindows() { return { m_pSceneTreeWindow, m_pGameObjectEditor }; };
 
 private:
