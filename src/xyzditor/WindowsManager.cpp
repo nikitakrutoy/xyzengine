@@ -29,6 +29,13 @@ void WindowsManager::ProcessInput()
 			if (ev.window.windowID == SDL_GetWindowID(w->GetWindow())) {
 				w->SetImguiContext();
 				ImGui_ImplSDL2_ProcessEvent(&ev);
+
+				if (ev.window.event == SDL_WINDOWEVENT_RESIZED) {
+					int wd, ht;
+					SDL_GetWindowSize(w->GetWindow(), &wd, &ht);
+					w->SetSize(wd, ht);
+				}
+
 				processed = true;
 				break;
 			}

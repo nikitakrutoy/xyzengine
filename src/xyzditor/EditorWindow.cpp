@@ -10,7 +10,7 @@
 
 #include <filesystem>
 
-EditorWindow::EditorWindow(RenderEngine* renderEngine, std::string name, size_t width, size_t height) : m_pRenderEngine(renderEngine)
+EditorWindow::EditorWindow(RenderEngine* renderEngine, std::string name, size_t width, size_t height) : m_pRenderEngine(renderEngine), width(width), height(height)
 {
 	SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 	m_SDL_Window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, window_flags);
@@ -43,13 +43,20 @@ void SceneTreeWindow::Update()
 	ImGui::SetCurrentContext(m_pImGuiContext);
 	SDL_GL_MakeCurrent(m_SDL_Window, m_GL_Context);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
 	{
 		bool f = true;
 		ImGui::ShowDemoWindow(&f);
-		ImGui::Begin("Scene");
+
+		ImGui::SetNextWindowSize(ImVec2(width, height));
+		ImGui::SetNextWindowPos(ImVec2(0, 0));
+		ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse;
+		ImGui::Begin("Scene", (bool*)0, window_flags);
 
 
 		ImGui::InputText("Scene name", sceneName, IM_ARRAYSIZE(sceneName));
@@ -121,7 +128,10 @@ void GameObjectEditor::Update()
 	ImGui::NewFrame();
 
 	auto node = m_pSelectedNode;
-	ImGui::Begin("Edit object");
+	ImGui::SetNextWindowSize(ImVec2(width, height));
+	ImGui::SetNextWindowPos(ImVec2(0, 0));
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse;
+	ImGui::Begin("Edit Object", (bool*)0, window_flags);
 	if (node) {
 		ImGui::InputText("Name", objectName, IM_ARRAYSIZE(objectName));
 		ImGui::SameLine();

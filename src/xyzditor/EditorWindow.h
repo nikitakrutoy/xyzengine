@@ -7,7 +7,7 @@
 class EditorWindow
 {
 public:
-	EditorWindow(RenderEngine* renderEngine, std::string name = "SDL Ogre Engine", size_t width = 200, size_t height = 500);
+	EditorWindow(RenderEngine* renderEngine, std::string name = "SDL Ogre Engine", size_t width = 500, size_t height = 200);
 
 	virtual void Update() {};
 	
@@ -15,11 +15,15 @@ public:
 	void SetImguiContext() { ImGui::SetCurrentContext(m_pImGuiContext); }
 	SDL_Window* GetWindow() { return m_SDL_Window; };
 
+	void SetSize(int w, int h) {
+		width = w;
+		height = h;
+	}
+
 	virtual ~EditorWindow();
 
-private:
-
 protected:
+	int width, height;
 	ImGuiContext* m_pImGuiContext;
 	SDL_Window* m_SDL_Window;
 	SDL_GLContext m_GL_Context;
@@ -32,7 +36,7 @@ protected:
 class SceneTreeWindow : public EditorWindow
 {
 public:
-	SceneTreeWindow(RenderEngine* renderEngine, std::string name, size_t width = 200, size_t height = 500) : EditorWindow(renderEngine, name, width, height) {
+	SceneTreeWindow(RenderEngine* renderEngine, std::string name, size_t width = 400, size_t height = 200) : EditorWindow(renderEngine, name, width, height) {
 		memset(sceneName, 0, 128); 
 		strncpy(sceneName, "default.json", 12);
 	};
@@ -51,7 +55,7 @@ private:
 class GameObjectEditor : public EditorWindow
 {
 public:
-	GameObjectEditor(RenderEngine* renderEngine, std::string name, size_t width = 200, size_t height = 500) : EditorWindow(renderEngine, name, width, height) {};
+	GameObjectEditor(RenderEngine* renderEngine, std::string name, size_t width = 400, size_t height = 200) : EditorWindow(renderEngine, name, width, height) {};
 	~GameObjectEditor() {};
 	void Update() override;
 	void SetSelected(Ogre::SceneNode* node);

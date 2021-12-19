@@ -33,8 +33,6 @@ Editor::Editor()
 		});
 	m_pRenderEngine->GetRT()->RC_EndFrame();
 
-
-
 	while (!m_pRenderEngine->IsInitialized()) {};
 
 	m_pSceneManager = m_pRenderEngine->GetSceneManager();
