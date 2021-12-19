@@ -25,11 +25,6 @@ RenderEngine::RenderEngine(ResourceManager* pResourceManager) :
 	m_SDL_Window = SDL_CreateWindow("SDL Ogre Engine ", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
 	m_pRT->RC_LambdaAction([this] {
 		RT_Init();
-		RT_SetupDefaultCamera();
-		RT_SetupDefaultCompositor();
-		RT_LoadDefaultResources();
-		RT_LoadDefaultScene();
-		RT_EndInit();
 	});
 
 
@@ -146,7 +141,7 @@ void RenderEngine::RT_LoadDefaultResources()
 void RenderEngine::RT_LoadDefaultScene() {
 	auto scenesPath = Ogre::ResourceGroupManager::getSingleton().listResourceLocations("Scenes")->at(0);
 	scenesPath += "/default.json";
-	SceneLoader::LoadXML(m_pSceneManager.get(), scenesPath);
+	SceneLoader::LoadJSON(m_pSceneManager.get(), scenesPath);
 }
 
 void RenderEngine::RT_LoadOgreHead()

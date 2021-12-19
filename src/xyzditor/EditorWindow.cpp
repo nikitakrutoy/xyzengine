@@ -46,6 +46,7 @@ void SceneTreeWindow::Update()
 {
 	ImGui::SetCurrentContext(m_pImGuiContext);
 	SDL_GL_MakeCurrent(m_SDL_Window, m_GL_Context);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame();
 	//ImGui_ImplSDLRenderer_NewFrame();
@@ -61,7 +62,7 @@ void SceneTreeWindow::Update()
 		if (ImGui::Button("Save", ImVec2(100, 20))) {
 			auto scenePath = Ogre::ResourceGroupManager::getSingleton().listResourceLocations("Scenes")->at(0);
 			scenePath += "/" + std::string(sceneName);
-			SceneLoader::StoreXML(m_pRenderEngine->GetSceneManager().get(), scenePath);
+			SceneLoader::StoreJSON(m_pRenderEngine->GetSceneManager().get(), scenePath);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Load", ImVec2(100, 20))) {
@@ -69,7 +70,7 @@ void SceneTreeWindow::Update()
 			auto scenePath = Ogre::ResourceGroupManager::getSingleton().listResourceLocations("Scenes")->at(0);
 			scenePath += "/" + std::string(sceneName);
 			m_pRenderEngine->GetRT()->RC_LambdaAction([re = m_pRenderEngine, scenePath] {
-				SceneLoader::LoadXML(re->GetSceneManager().get(), scenePath);
+				SceneLoader::LoadJSON(re->GetSceneManager().get(), scenePath);
 				});
 		}
 
@@ -89,7 +90,6 @@ void SceneTreeWindow::Update()
 		DrawSceneTree(m_pRenderEngine->GetSceneManager()->getRootSceneNode());
 		ImGui::End();
 	}
-
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	SwapFrames();
@@ -127,6 +127,7 @@ void GameObjectEditor::Update()
 {
 	ImGui::SetCurrentContext(m_pImGuiContext);
 	SDL_GL_MakeCurrent(m_SDL_Window, m_GL_Context);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame();
 	//ImGui_ImplSDLRenderer_NewFrame();

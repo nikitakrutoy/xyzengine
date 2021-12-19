@@ -78,7 +78,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)\..\libs\SDL2\include;$(SolutionDir)\..\libs\json\single_include;$(SolutionDir)\..\libs\Ogre\include\OGRE;$(SolutionDir)\..\libs\Ogre\include\OGRE\Hlms\Common;$(SolutionDir)\..\src\xyzender\</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)\..\libs\SDL2\include;$(SolutionDir)\..\libs\json\single_include;$(SolutionDir)\..\libs\Ogre\include\OGRE;$(SolutionDir)\..\libs\Ogre\include\OGRE\Hlms\Common;$(SolutionDir)\..\src\xyzender\;$(SolutionDir)\..\libs\flecs\;$(SolutionDir)\..\libs\lua\include;$(SolutionDir)\..\libs\LuaBridge3\include;$(SolutionDir)\..\libs\gl3w\include</IncludePath>
     <OutDir>$(SolutionDir)\..\bin\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -145,15 +145,32 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libs\json\single_include\nlohmann\json.hpp" />
+    <ClInclude Include="ecsComponents.h" />
+    <ClInclude Include="ecsSceneObject.h" />
+    <ClInclude Include="ecsScript.h" />
+    <ClInclude Include="EntityManager.h" />
     <ClInclude Include="InputHandler.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Scancodes.h" />
     <ClInclude Include="SceneLoader.h" />
+    <ClInclude Include="Script.h" />
+    <ClInclude Include="ScriptManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ecsSceneObject.cpp" />
+    <ClCompile Include="ecsScript.cpp" />
+    <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="InputHandler.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="SceneLoader.cpp" />
+    <ClCompile Include="Script.cpp" />
+    <ClCompile Include="ScriptManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\libs\flecs\flecs.vcxproj">
+      <Project>{f9425b19-3687-425b-a5b8-3ed1fd9f428c}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

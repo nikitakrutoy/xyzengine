@@ -46,12 +46,6 @@ public:
 
 	bool IsInitialized() { return m_bIsInitialized; }
 
-private:
-	bool SetOgreConfig();
-
-	void RT_SDLClenup();
-	void RT_Init();
-	void RT_InitSDL();
 	void RT_SetupDefaultCamera();
 	void RT_SetupDefaultCompositor();
 	void RT_LoadDefaultResources();
@@ -59,6 +53,14 @@ private:
 	void RT_LoadOgreHead();
 	void RT_SetupDefaultLight();
 	void RT_EndInit();
+
+private:
+	bool SetOgreConfig();
+
+	void RT_SDLClenup();
+	void RT_Init();
+	void RT_InitSDL();
+
 
 	SDL_Window* m_SDL_Window;
 

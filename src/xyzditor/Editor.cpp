@@ -20,9 +20,20 @@ Editor::Editor()
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 	SDL_Init(SDL_INIT_VIDEO);
 
+	gl3wInit();
+
 	m_pResourceManager = new ResourceManager("..\\..\\Media\\");
 	m_pRenderEngine = new RenderEngine(m_pResourceManager);
+	m_pRenderEngine->GetRT()->RC_LambdaAction([re = m_pRenderEngine] {
+		re->RT_SetupDefaultCamera();
+		re->RT_SetupDefaultCompositor();
+		re->RT_LoadDefaultResources();
+		re->RT_LoadDefaultScene();
+		re->RT_EndInit();
+		});
 	m_pRenderEngine->GetRT()->RC_EndFrame();
+
+
 
 	while (!m_pRenderEngine->IsInitialized()) {};
 

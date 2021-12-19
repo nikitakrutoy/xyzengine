@@ -79,7 +79,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)\..\bin\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)\..\libs\Ogre\include\OGRE;$(SolutionDir)\..\libs\Ogre\include\OGRE\Hlms\Common;$(SolutionDir)\..\libs\SDL2\include;$(SolutionDir)\..\libs\imgui\;$(SolutionDir)\..\libs\imgui\backends\;$(SolutionDir)\..\libs\Ogre\include\OGRE\RenderSystems\GL3PLus;$(SolutionDir)\..\src\xyzngine;$(SolutionDir)\..\libs\gl3w\include;$(SolutionDir)\..\libs\json\single_include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)\..\libs\Ogre\include\OGRE;$(SolutionDir)\..\libs\Ogre\include\OGRE\Hlms\Common;$(SolutionDir)\..\libs\SDL2\include;$(SolutionDir)\..\libs\imgui\;$(SolutionDir)\..\libs\imgui\backends\;$(SolutionDir)\..\libs\Ogre\include\OGRE\RenderSystems\GL3PLus;$(SolutionDir)\..\libs\gl3w\include;$(SolutionDir)\..\libs\json\single_include;$(SolutionDir)\..\src\xyzngine;$(SolutionDir)\..\libs\lua\include;$(SolutionDir)\..\libs\LuaBridge3\include;$(SolutionDir)\..\libs\flecs\</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -150,6 +150,11 @@
     <ClInclude Include="OgreUtils.h" />
     <ClInclude Include="RenderEngine.h" />
     <ClInclude Include="RenderThread.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\xyzngine\xyzngine.vcxproj">
+      <Project>{bcc0369d-60b2-49b5-af98-2861ad3f3d12}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

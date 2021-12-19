@@ -4,11 +4,7 @@ void OgreUtils::destroyAllAttachedMovableObjects(Ogre::SceneNode* node)
 {
 	if (!node) return;
 
-	// Destroy all the attached objects
-	Ogre::SceneNode::ObjectIterator itObject = node->getAttachedObjectIterator();
-
-	while (itObject.hasMoreElements())
-		node->getCreator()->destroyMovableObject(itObject.getNext());
+	destroyAttachedItem(node);
 
 	// Recurse to child SceneNodes
 	Ogre::SceneNode::NodeVecIterator itChild = node->getChildIterator();

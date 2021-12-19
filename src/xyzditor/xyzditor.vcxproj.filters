@@ -45,9 +45,6 @@
     <ClInclude Include="..\..\libs\imgui\backends\imgui_impl_opengl3.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\libs\imgui\backends\imgui_impl_opengl3_loader.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
     <ClInclude Include="EditorWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -97,6 +94,9 @@
     </ClCompile>
     <ClCompile Include="..\..\libs\imgui\backends\imgui_impl_sdlrenderer.cpp">
       <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\gl3w\src\gl3w.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
