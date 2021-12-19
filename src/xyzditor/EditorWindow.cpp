@@ -12,8 +12,8 @@
 
 EditorWindow::EditorWindow(RenderEngine* renderEngine, std::string name, size_t width, size_t height) : m_pRenderEngine(renderEngine), width(width), height(height)
 {
-	SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-	m_SDL_Window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, window_flags);
+	SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_MOUSE_FOCUS);
+	m_SDL_Window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, window_flags);
 
 	m_GL_Context = SDL_GL_CreateContext(m_SDL_Window);
 	SDL_GL_MakeCurrent(m_SDL_Window, m_GL_Context);
@@ -219,7 +219,7 @@ void GameObjectEditor::SetSelected(Ogre::SceneNode* node)
 			objectType = obj->getMovableType();
 			if (objectType == "Item") {
 				auto item = dynamic_cast<Ogre::Item*>(obj);
-				meshName = item->getMesh().get()->getName();
+				meshName = item->getName();
 			}
 		}
 	}

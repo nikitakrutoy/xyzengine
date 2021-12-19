@@ -57,10 +57,10 @@ void Editor::Run()
 	double deltaTime = 0;
 	double speed = 1000;
 	
-	SDL_SysWMinfo info;
-	SDL_VERSION(&info.version);
-	SDL_GetWindowWMInfo(m_pRenderEngine->GetWindow(), &info);
-	MessageBox(info.info.win.window, L"Hello", L"Caption", MB_OKCANCEL);
+	//SDL_SysWMinfo info;
+	//SDL_VERSION(&info.version);
+	//SDL_GetWindowWMInfo(m_pRenderEngine->GetWindow(), &info);
+	//MessageBox(info.info.win.window, L"Hello", L"Caption", MB_OKCANCEL);
 
 	while (true)
 	{
@@ -76,32 +76,32 @@ void Editor::Run()
 		m_pWindowsManager->Update();
 
 		m_pRenderEngine->GetMainCamera();
-		if (m_pInputHandler->Get(SDLK_w))
+		if (m_pInputHandler->Get(SDL_SCANCODE_W))
 			m_pRenderEngine->GetRT()->RC_LambdaAction([c = m_pRenderEngine->GetMainCamera(), deltaTime] {
 				c->setPosition(c->getDirection() * deltaTime + c->getPosition());
 			});
 
-		if (m_pInputHandler->Get(SDLK_s))
+		if (m_pInputHandler->Get(SDL_SCANCODE_S))
 			m_pRenderEngine->GetRT()->RC_LambdaAction([c = m_pRenderEngine->GetMainCamera(), deltaTime]{
 				c->setPosition(c->getPosition()  - c->getDirection() * deltaTime);
 			});
 
-		if (m_pInputHandler->Get(SDLK_d))
+		if (m_pInputHandler->Get(SDL_SCANCODE_D))
 			m_pRenderEngine->GetRT()->RC_LambdaAction([c = m_pRenderEngine->GetMainCamera(), deltaTime]{
 				c->setPosition(c->getPosition() + c->getRight() * deltaTime);
 			});
 
-		if (m_pInputHandler->Get(SDLK_a))
+		if (m_pInputHandler->Get(SDL_SCANCODE_A))
 			m_pRenderEngine->GetRT()->RC_LambdaAction([c = m_pRenderEngine->GetMainCamera(), deltaTime]{
 				c->setPosition(c->getPosition() - c->getRight() * deltaTime);
 			});
 
-		if (m_pInputHandler->Get(SDLK_e))
+		if (m_pInputHandler->Get(SDL_SCANCODE_E))
 			m_pRenderEngine->GetRT()->RC_LambdaAction([c = m_pRenderEngine->GetMainCamera(), deltaTime]{
 				c->setPosition(c->getPosition() + c->getUp() * deltaTime);
 			});
 
-		if (m_pInputHandler->Get(SDLK_q))
+		if (m_pInputHandler->Get(SDL_SCANCODE_Q))
 			m_pRenderEngine->GetRT()->RC_LambdaAction([c = m_pRenderEngine->GetMainCamera(), deltaTime]{
 				c->setPosition(c->getPosition() - c->getUp() * deltaTime);
 			});

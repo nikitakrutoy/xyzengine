@@ -1,4 +1,5 @@
 #include "InputHandler.h"
+#include "Scancodes.h"
 #include <algorithm>
 
 #include "Ogre.h"
@@ -15,6 +16,12 @@ InputHandler::InputHandler(std::string path)
 
 	Ogre::ConfigFile::SectionIterator secIter = cf.getSectionIterator();
 
+	for (int i = 0; i < SCANCODES.size(); i++) {
+		if (!SCANCODES[i].empty()) {
+			m_key2code[SCANCODES[i]] = SDL_Scancode(i);
+		}
+	}
+
 	Ogre::String strInputType, strCommand, strSymbol;
 	while (secIter.hasMoreElements())
 	{
@@ -30,14 +37,12 @@ InputHandler::InputHandler(std::string path)
 			m_command2key[strCommand] = strSymbol;
 		}
 	}
-
-
 }
 
 void InputHandler::Update(SDL_Window* window, float deltaTime)
 {
 	SDL_Event ev;
-	SDL_Keycode key;
+	SDL_Scancode key;
 	int width, height;
 	SDL_GetWindowSize(window, &width, &height);
 	mouseDiffX = 0.f;
@@ -51,12 +56,12 @@ void InputHandler::Update(SDL_Window* window, float deltaTime)
 		switch (ev.type)
 		{
 		case SDL_KEYDOWN:
-			key = ev.key.keysym.sym;
+			key = ev.key.keysym.scancode;
 			m_keyState[key] = true;
 			break;
 
 		case SDL_KEYUP:
-			key = ev.key.keysym.sym;
+			key = ev.key.keysym.scancode;
 			m_keyState[key] = false;
 			break;
 
@@ -79,4 +84,19 @@ void InputHandler::Update(SDL_Window* window, float deltaTime)
 			break;
 		}
 	}
+}
+
+bool InputHandler::GetCommand(std::string command) const
+{
+	std::string key;
+	SDL_Scancode code;
+	if (m_command2key.find(command) != m_command2key.end())
+		key = m_command2key.at(command);
+	else
+		return false;
+	if (m_key2code.find(key) != m_key2code.end())
+		code = m_key2code.at(key);
+	else
+		return false;
+	return m_keyState.find(code) != m_keyState.end() ? m_keyState.at(code) : false;
 }
