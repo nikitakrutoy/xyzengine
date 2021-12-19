@@ -22,6 +22,9 @@ void SceneLoader::StoreJSON(Ogre::SceneManager* sceneManager, std::string path)
 
 		childObj["position"] = json::array({ position.x, position.y, position.z });
 		childObj["scale"] = json::array({ scale.x, scale.y, scale.z });
+		auto scriptName = child->getUserObjectBindings().getUserAny("scriptName");
+		if (!scriptName.isEmpty()) 
+			childObj["scriptName"] = Ogre::any_cast<std::string>(scriptName); 
 		Ogre::SceneNode::ObjectIterator iter = child->getAttachedObjectIterator();
 		while (iter.hasMoreElements()) {
 			Ogre::MovableObject* movObj = iter.getNext();

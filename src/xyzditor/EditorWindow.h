@@ -23,7 +23,6 @@ protected:
 	ImGuiContext* m_pImGuiContext;
 	SDL_Window* m_SDL_Window;
 	SDL_GLContext m_GL_Context;
-	SDL_Renderer* m_pSDLRenderer;
 
 protected:
 	RenderEngine* m_pRenderEngine;
@@ -61,6 +60,7 @@ private:
 	Ogre::SceneNode* m_pSelectedNode = nullptr;
 	char objectName[128];
 	std::string meshName;
+	std::string scriptName;
 	std::string objectType;
 };
 

@@ -18,7 +18,6 @@ EditorWindow::EditorWindow(RenderEngine* renderEngine, std::string name, size_t 
 	m_GL_Context = SDL_GL_CreateContext(m_SDL_Window);
 	SDL_GL_MakeCurrent(m_SDL_Window, m_GL_Context);
 	SDL_GL_SetSwapInterval(0.5);
-	m_pSDLRenderer = SDL_CreateRenderer(m_SDL_Window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 
 	IMGUI_CHECKVERSION();
 
@@ -27,9 +26,6 @@ EditorWindow::EditorWindow(RenderEngine* renderEngine, std::string name, size_t 
 
 	ImGui::StyleColorsDark();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
-
-	//ImGui_ImplSDL2_InitForSDLRenderer(m_SDL_Window);
-	//ImGui_ImplSDLRenderer_Init(m_pSDLRenderer);
 
 	ImGui_ImplSDL2_InitForOpenGL(m_SDL_Window, m_GL_Context);
 	bool f = ImGui_ImplOpenGL3_Init(SDL_GL_VERSION);
@@ -49,8 +45,6 @@ void SceneTreeWindow::Update()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame();
-	//ImGui_ImplSDLRenderer_NewFrame();
-	//ImGui_ImplSDL2_NewFrame(m_SDL_Window);
 	ImGui::NewFrame();
 	{
 		bool f = true;
@@ -93,12 +87,6 @@ void SceneTreeWindow::Update()
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	SwapFrames();
-	//ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-	//SDL_SetRenderDrawColor(m_pSDLRenderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
-	//SDL_RenderClear(m_pSDLRenderer);
-	//ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-
-	//SDL_RenderPresent(m_pSDLRenderer);
 }
 
 void SceneTreeWindow::DrawSceneTree(Ogre::SceneNode* node)
@@ -130,8 +118,6 @@ void GameObjectEditor::Update()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame();
-	//ImGui_ImplSDLRenderer_NewFrame();
-	//ImGui_ImplSDL2_NewFrame(m_SDL_Window);
 	ImGui::NewFrame();
 
 	auto node = m_pSelectedNode;
@@ -159,6 +145,20 @@ void GameObjectEditor::Update()
 		});
 
 		ImGui::Text("Object Type"); ImGui::SameLine(); ImGui::Text(objectType.c_str());
+
+		auto scripts = Ogre::ResourceGroupManager::getSingleton().listResourceNames("Scripts");
+		if (ImGui::BeginCombo("Script", scriptName.c_str(), 0))
+		{
+			for (int n = 0; n < scripts->size(); n++)
+			{
+				std::string selectedScriptName = scripts->at(n);
+				if (ImGui::Selectable(selectedScriptName.c_str()) && !selectedScriptName.empty()) {
+					node->getUserObjectBindings().setUserAny("scriptName", Ogre::Any(selectedScriptName));
+					scriptName = selectedScriptName;
+				}
+			}
+			ImGui::EndCombo();
+		}
 
 		auto models = Ogre::ResourceGroupManager::getSingleton().listResourceNames("Models");
 		if (objectType == "Item") {
@@ -188,12 +188,6 @@ void GameObjectEditor::Update()
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	SwapFrames();
-	//ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-	//SDL_SetRenderDrawColor(m_pSDLRenderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
-	//SDL_RenderClear(m_pSDLRenderer);
-	//ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-
-	//SDL_RenderPresent(m_pSDLRenderer);
 }
 
 void GameObjectEditor::SetSelected(Ogre::SceneNode* node)
@@ -204,6 +198,12 @@ void GameObjectEditor::SetSelected(Ogre::SceneNode* node)
 		memset(objectName, 0, 128);
 		strncpy(objectName, node->getName().c_str(), node->getName().length());
 		auto objects = node->getAttachedObjectIterator();
+		auto bindigns = node->getUserObjectBindings();
+		auto script = bindigns.getUserAny("scriptName");
+		if (!script.isEmpty())
+			scriptName = Ogre::any_cast<std::string>(script);
+		else
+			scriptName = std::string();
 		while (objects.hasMoreElements()) {
 			auto obj = objects.getNext();
 			objectType = obj->getMovableType();

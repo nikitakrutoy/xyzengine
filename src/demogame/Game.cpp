@@ -26,7 +26,7 @@ Game::Game()
 	m_pInputHandler = new InputHandler("..\\..\\Media\\");
 	m_pRenderEngine = new RenderEngine(m_pResourceManager);
 	m_pECS = new flecs::world();
-	m_pScriptManager = new ScriptManager(m_pInputHandler, "..\\..\\Media\\Scripts\\");
+	m_pScriptManager = new ScriptManager(m_pInputHandler, "..\\..\\Media\\scripts\\");
 	m_pEntityManager = new EntityManager(m_pRenderEngine, m_pScriptManager, m_pECS);
 	m_pRenderEngine->GetRT()->RC_LambdaAction([=] {
 		m_pRenderEngine->RT_SetupDefaultCamera();
