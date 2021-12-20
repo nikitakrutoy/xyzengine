@@ -5,6 +5,12 @@
 #include "OgreMeshManager.h"
 #include "OgreMeshManager2.h"
 
+struct Transform {
+	Ogre::Vector3 Position;
+	Ogre::Vector3 Scale;
+	Ogre::Quaternion Orientation;
+};
+
 
 namespace OgreUtils
 {

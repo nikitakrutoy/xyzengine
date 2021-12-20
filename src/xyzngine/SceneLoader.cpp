@@ -1,7 +1,7 @@
 #include "SceneLoader.h"
 #include "OgreItem.h"
 #include "OgreMesh2.h"
-#include "OgreUtils.h"
+#include "RenderUtils.h"
 #include "OgreCamera.h"
 #include <fstream>
 

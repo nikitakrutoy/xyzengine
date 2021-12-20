@@ -15,8 +15,17 @@ void EntityManager::CreateEntity(Ogre::SceneNode* sceneNode, std::string strScri
 	flecs::entity newEntity = m_pEcs->entity();
 
 	Script* pScript = m_pScriptManager->CreateScript(strScriptName, newEntity);
+	Transform transform = Transform{
+		sceneNode->getPosition(),
+		sceneNode->getScale(),
+		sceneNode->getOrientation()
+	};
+	pScript->InitTransform(transform);
+	pScript->Initialize();
+	pScript->GetComponents(newEntity);
 
 
 	newEntity.set(ScriptComponent{ pScript });
 	newEntity.set(RenderComponent{ sceneNode });
+	newEntity.set(Transform(transform));
 }

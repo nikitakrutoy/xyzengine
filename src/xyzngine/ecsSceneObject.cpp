@@ -12,13 +12,10 @@ void register_ecs_control_systems(flecs::world* ecs)
 				cameraPos.z = vCameraPosition.z;
 			});
 
-	ecs->system<const Controllable, ScriptComponent, Position>()
-		.each([&](flecs::entity e, const Controllable&, ScriptComponent& script, Position& pos)
+	ecs->system<const Controllable, ScriptComponent, Transform>()
+		.each([&](flecs::entity e, const Controllable&, ScriptComponent& script, Transform& t)
 			{
-				Ogre::Vector3 vPosition = script.ptr->GetPosition();
-				pos.x = vPosition.x;
-				pos.y = vPosition.y;
-				pos.z = vPosition.z;
+				t = script.ptr->GetTransform();
 			});
 }
 
@@ -26,13 +23,13 @@ void register_ecs_render_systems(flecs::world* ecs)
 {
 	static auto renderQuery = ecs->query<RenderEnginePtr>();
 
-	ecs->system<RenderComponent, const Position>()
-		.each([&](RenderComponent& renderNode, const Position& pos)
+	ecs->system<RenderComponent, const Transform>()
+		.each([&](RenderComponent& renderNode, const Transform& t)
 			{
 				renderQuery.each([&](RenderEnginePtr renderEngine)
 					{
 						renderEngine.ptr->GetRT()->RC_LambdaAction([=] {
-							renderNode.ptr->setPosition(pos);
+							renderNode.ptr->setPosition(t.Position);
 							});
 					});
 			});

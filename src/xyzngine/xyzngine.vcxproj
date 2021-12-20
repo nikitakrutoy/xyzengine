@@ -163,6 +163,7 @@
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="InputHandler.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="Scancodes.cpp" />
     <ClCompile Include="SceneLoader.cpp" />
     <ClCompile Include="Script.cpp" />
     <ClCompile Include="ScriptManager.cpp" />

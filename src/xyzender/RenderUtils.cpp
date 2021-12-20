@@ -1,4 +1,4 @@
-#include "OgreUtils.h"
+#include "RenderUtils.h"
 
 void OgreUtils::destroyAllAttachedMovableObjects(Ogre::SceneNode* node)
 {

@@ -142,12 +142,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="OgreUtils.cpp" />
+    <ClCompile Include="RenderUtils.cpp" />
     <ClCompile Include="RenderEngine.cpp" />
     <ClCompile Include="RenderThread.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="OgreUtils.h" />
+    <ClInclude Include="RenderUtils.h" />
     <ClInclude Include="RenderEngine.h" />
     <ClInclude Include="RenderThread.h" />
   </ItemGroup>
