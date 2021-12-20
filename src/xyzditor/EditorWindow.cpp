@@ -5,10 +5,29 @@
 #include "imgui_impl_sdlrenderer.h"
 #include "imgui_impl_sdl.h"
 #include "Common.h"
-#include "OgreUtils.h"
+#include "RenderUtils.h"
 #include "SceneLoader.h"
 
 #include <filesystem>
+
+std::string OBJECT_TYPES[] = {
+	"Empty",
+	"Mesh",
+	"Light"
+};
+
+static void HelpMarker(const char* desc)
+{
+	ImGui::TextDisabled("(?)");
+	if (ImGui::IsItemHovered())
+	{
+		ImGui::BeginTooltip();
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(desc);
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
+}
 
 EditorWindow::EditorWindow(RenderEngine* renderEngine, std::string name, size_t width, size_t height) : m_pRenderEngine(renderEngine), width(width), height(height)
 {
@@ -38,6 +57,41 @@ EditorWindow::~EditorWindow()
 	SDL_DestroyWindow(m_SDL_Window);
 }
 
+void SceneTreeWindow::AddObject(Ogre::SceneNode* node) {
+	if (ImGui::Button("Add Empty", ImVec2(100, 20)))
+	{
+		m_pRenderEngine->GetRT()->RC_LambdaAction([node]{
+			Ogre::SceneNode * sceneNode = node->createChildSceneNode(Ogre::SCENE_DYNAMIC);
+			sceneNode->setName("Default Empty");
+			});
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Add Mesh", ImVec2(100, 20)))
+	{
+		m_pRenderEngine->GetRT()->RC_LambdaAction([node, mgr = m_pRenderEngine->GetSceneManager()]{
+			Ogre::Item * item = OgreUtils::loadMesh("ogrehead.mesh", mgr.get());
+			Ogre::SceneNode * sceneNode = node->createChildSceneNode(Ogre::SCENE_DYNAMIC);
+			sceneNode->attachObject(item);
+			sceneNode->scale(1.f, 1.0f, 1.0f);
+			sceneNode->setName("Default Mesh");
+			});
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Add Light", ImVec2(100, 20)))
+	{
+		m_pRenderEngine->GetRT()->RC_LambdaAction([node, mgr = m_pRenderEngine->GetSceneManager()]{
+			Ogre::Light * light = mgr->createLight();
+			Ogre::SceneNode * lightNode = node->createChildSceneNode();
+			lightNode->attachObject(light);
+			light->setPowerScale(Ogre::Math::PI);
+			light->setType(Ogre::Light::LT_DIRECTIONAL);
+			light->setDirection(Ogre::Vector3(-1, -1, -1).normalisedCopy());
+			lightNode->setName("Default Light");
+			light->setAttenuation(100, 1.0, 0.045, 0.0075);
+			});
+	}
+}
+
 void SceneTreeWindow::Update()
 {
 	ImGui::SetCurrentContext(m_pImGuiContext);
@@ -50,9 +104,6 @@ void SceneTreeWindow::Update()
 	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
 	{
-		bool f = true;
-		ImGui::ShowDemoWindow(&f);
-
 		ImGui::SetNextWindowSize(ImVec2(width, height));
 		ImGui::SetNextWindowPos(ImVec2(0, 0));
 		ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse;
@@ -71,23 +122,11 @@ void SceneTreeWindow::Update()
 			auto scenePath = Ogre::ResourceGroupManager::getSingleton().listResourceLocations("Scenes")->at(0);
 			scenePath += "/" + std::string(sceneName);
 			m_pRenderEngine->GetRT()->RC_LambdaAction([re = m_pRenderEngine, scenePath] {
-				SceneLoader::LoadJSON(re->GetSceneManager().get(), scenePath);
+				SceneLoader::LoadJSON(re->GetSceneManager().get(), nullptr, scenePath);
 				});
 		}
+		AddObject(m_pRenderEngine->GetSceneManager()->getRootSceneNode(Ogre::SCENE_DYNAMIC));
 
-		if (ImGui::Button("Add", ImVec2(100, 20)))
-		{
-			m_pRenderEngine->GetRT()->RC_LambdaAction([mgr = m_pRenderEngine->GetSceneManager()]{
-				Ogre::Item * item = mgr->createItem("ogrehead.mesh",
-					Ogre::ResourceGroupManager::
-					AUTODETECT_RESOURCE_GROUP_NAME,
-					Ogre::SCENE_DYNAMIC);
-				Ogre::SceneNode * sceneNode = mgr->getRootSceneNode(Ogre::SCENE_DYNAMIC)->createChildSceneNode(Ogre::SCENE_DYNAMIC);
-				sceneNode->attachObject(item);
-				sceneNode->scale(1.f, 1.0f, 1.0f);
-				sceneNode->setName("Default");
-				});
-		}
 		DrawSceneTree(m_pRenderEngine->GetSceneManager()->getRootSceneNode());
 		ImGui::End();
 	}
@@ -105,6 +144,7 @@ void SceneTreeWindow::DrawSceneTree(Ogre::SceneNode* node)
 			if (ImGui::Button("Edit", ImVec2(100, 20))) {
 				m_pSelectedNode = child;
 			};
+			ImGui::SameLine();
 			if (ImGui::Button("Delete", ImVec2(100, 20))) {
 				if (m_pSelectedNode == child)
 					m_pSelectedNode = nullptr;
@@ -112,6 +152,7 @@ void SceneTreeWindow::DrawSceneTree(Ogre::SceneNode* node)
 					OgreUtils::destroySceneNode(child);
 				});
 			}
+			AddObject(child);
 			DrawSceneTree(child);
 			ImGui::TreePop();
 		}
@@ -142,17 +183,23 @@ void GameObjectEditor::Update()
 			
 
 		auto pos = node->getPosition();
-		ImGui::SliderFloat3("Position", &pos.x, -10.f, 10.f, "%.3f");
+		ImGui::DragFloat3("Position", &pos.x, 0.005f);
 		m_pRenderEngine->GetRT()->RC_LambdaAction([node, pos] {
 			node->setPosition(pos);
 			});
 
 		auto scale = node->getScale();
-		ImGui::SliderFloat3("Scale", &scale.x, -10.f, 10.f, "%.3f");
-		
+		ImGui::DragFloat3("Scale", &scale.x, 0.005f);
 		m_pRenderEngine->GetRT()->RC_LambdaAction([node, scale] {
 			node->setScale(scale);
 		});
+
+		bool prevVisibility = visibility;
+		ImGui::Checkbox("Visibility", &visibility);
+		if (prevVisibility != visibility)
+			m_pRenderEngine->GetRT()->RC_LambdaAction([node, prevVisibility]{
+							node->setVisible(!prevVisibility);
+				});
 
 		ImGui::Text("Object Type"); ImGui::SameLine(); ImGui::Text(objectType.c_str());
 
@@ -189,6 +236,32 @@ void GameObjectEditor::Update()
 				ImGui::EndCombo();
 			}
 		}
+		if (objectType == "Light") {
+			int prevLightType = lightType;
+			ImGui::SliderInt("Light Type", &lightType, 0, 2, "%d", ImGuiSliderFlags_NoInput);
+			HelpMarker(
+				"0 - Directional.\n"
+				"1 - Point.\n"
+				"2 - Spotlight.");
+
+			if (prevLightType != lightType) {
+				m_pRenderEngine->GetRT()->RC_LambdaAction([this]{
+					light->setType(Ogre::Light::LightTypes(lightType));
+				});
+			}
+
+			auto dir = light->getDirection();
+			ImGui::DragFloat3("Direction", &dir.x, 0.005f);
+			m_pRenderEngine->GetRT()->RC_LambdaAction([this, dir] {
+				light->setDirection(dir);
+				});
+
+			auto scale = light->getPowerScale();
+			ImGui::DragFloat("Power Scale", &scale, 0.005f);
+			m_pRenderEngine->GetRT()->RC_LambdaAction([this, scale] {
+				light->setPowerScale(scale);
+			});
+		}
 	}
 	else {
 		ImGui::Text("Select Node in Scene Tree");
@@ -210,6 +283,7 @@ void GameObjectEditor::SetSelected(Ogre::SceneNode* node)
 		auto objects = node->getAttachedObjectIterator();
 		auto bindigns = node->getUserObjectBindings();
 		auto script = bindigns.getUserAny("scriptName");
+		objectType = "Empty";
 		if (!script.isEmpty())
 			scriptName = Ogre::any_cast<std::string>(script);
 		else
@@ -217,10 +291,28 @@ void GameObjectEditor::SetSelected(Ogre::SceneNode* node)
 		while (objects.hasMoreElements()) {
 			auto obj = objects.getNext();
 			objectType = obj->getMovableType();
+			visibility = obj->isVisible();
 			if (objectType == "Item") {
-				auto item = dynamic_cast<Ogre::Item*>(obj);
+				item = dynamic_cast<Ogre::Item*>(obj);
 				meshName = item->getName();
+			}
+			if (objectType == "Light") {
+				light = dynamic_cast<Ogre::Light*>(obj);
+				lightType = light->getType();
 			}
 		}
 	}
+}
+
+ void DemoWindow::Update() {
+	ImGui::SetCurrentContext(m_pImGuiContext);
+	SDL_GL_MakeCurrent(m_SDL_Window, m_GL_Context);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+	ImGui::NewFrame();
+	ImGui::ShowDemoWindow();
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	SwapFrames();
 }

@@ -104,6 +104,7 @@ void RenderEngine::RT_Init()
 
 	// Scene manager
 	m_pSceneManager = std::unique_ptr<Ogre::SceneManager>(m_pRoot->createSceneManager(Ogre::SceneType::ST_GENERIC, 2));
+	m_pSceneManager->setForward3D(true, 4, 4, 5, 96, 3, 200);
 
 }
 
@@ -131,6 +132,7 @@ void RenderEngine::RT_SetupDefaultCompositor()
 
 	m_pWorkspace = std::unique_ptr<Ogre::CompositorWorkspace>
 		(compositorManager->addWorkspace(m_pSceneManager.get(), m_pRenderWindow->getTexture(), m_pCamera.get(), workspaceName, true));
+
 }
 
 void RenderEngine::RT_LoadDefaultResources()
@@ -141,7 +143,7 @@ void RenderEngine::RT_LoadDefaultResources()
 void RenderEngine::RT_LoadDefaultScene() {
 	auto scenesPath = Ogre::ResourceGroupManager::getSingleton().listResourceLocations("Scenes")->at(0);
 	scenesPath += "/default.json";
-	SceneLoader::LoadJSON(m_pSceneManager.get(), scenesPath);
+	SceneLoader::LoadJSON(m_pSceneManager.get(), nullptr, scenesPath);
 }
 
 void RenderEngine::RT_LoadOgreHead()

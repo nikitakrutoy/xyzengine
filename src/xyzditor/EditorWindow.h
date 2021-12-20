@@ -46,6 +46,7 @@ public:
 
 private:
 	char sceneName[128];
+	void AddObject(Ogre::SceneNode* node);
 
 	void DrawSceneTree(Ogre::SceneNode* node);
 	Ogre::SceneNode* m_pSelectedNode = nullptr;
@@ -62,10 +63,24 @@ public:
 
 private:
 	Ogre::SceneNode* m_pSelectedNode = nullptr;
+	bool visibility = true;
+	int lightType = 0;
 	char objectName[128];
 	std::string meshName;
 	std::string scriptName;
 	std::string objectType;
+
+	Ogre::Item* item;
+	Ogre::Light* light;
 };
 
+class DemoWindow : public EditorWindow
+{
+public:
+	DemoWindow(RenderEngine* renderEngine, std::string name, size_t width = 400, size_t height = 200) : EditorWindow(renderEngine, name, width, height) {
+	};
+	~DemoWindow() {};
+	void Update() override;;
+
+};
 

@@ -8,6 +8,5 @@ class SceneLoader
 {
 public:
 	static void StoreJSON(Ogre::SceneManager* sceneManager, std::string path);
-	static void LoadJSON(Ogre::SceneManager* sceneManager, std::string path);
-	static void LoadJSON2ECS(Ogre::SceneManager* sceneManager, EntityManager* entityManager, std::string path);
+	static void LoadJSON(Ogre::SceneManager* sceneManager, EntityManager* entityManager, std::string path);
 };
