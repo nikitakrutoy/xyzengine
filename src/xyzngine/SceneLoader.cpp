@@ -29,6 +29,9 @@ void StoreObjects(json& d, Ogre::SceneNode* node) {
 			if (childObj["type"] == "Item") {
 				Ogre::Item* item = dynamic_cast<Ogre::Item*>(movObj);
 				childObj["meshName"] = item->getName();
+				auto materialName = child->getUserObjectBindings().getUserAny("materialName");
+				if (!materialName.isEmpty())
+					childObj["materialName"] = Ogre::any_cast<std::string>(materialName);
 			}
 			if (childObj["type"] == "Light") {
 				Ogre::Light* light = dynamic_cast<Ogre::Light*>(movObj);
@@ -59,6 +62,8 @@ void LoadObjects(json& j, Ogre::SceneManager* sceneManager, EntityManager* entit
 			Ogre::Item* item = OgreUtils::loadMesh(obj["meshName"], sceneManager);
 
 			item->setName(obj["meshName"]);
+			if(obj.find("materialName") != obj.end())
+				item->setDatablock(obj["materialName"]);
 			sceneNode->attachObject(item);
 		}
 

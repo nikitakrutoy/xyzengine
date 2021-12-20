@@ -8,6 +8,11 @@
 #include "RenderUtils.h"
 #include "SceneLoader.h"
 
+
+#include "OgreHlmsManager.h"
+#include "Hlms/Pbs/OgreHlmsPbs.h"
+#include "Hlms/Unlit/OgreHlmsUnlit.h"
+
 #include <filesystem>
 
 std::string OBJECT_TYPES[] = {
@@ -218,6 +223,12 @@ void GameObjectEditor::Update()
 			ImGui::EndCombo();
 		}
 
+		Ogre::Hlms* hlmsPbs = Ogre::Root::getSingleton().getHlmsManager()->getHlms(Ogre::HLMS_PBS);
+		Ogre::Hlms* hlmsUnlit = Ogre::Root::getSingleton().getHlmsManager()->getHlms(Ogre::HLMS_UNLIT);
+		auto dtmap = hlmsPbs->getDatablockMap();
+		auto dtmap2 = hlmsUnlit->getDatablockMap();
+		dtmap.merge(dtmap2);
+
 		auto models = Ogre::ResourceGroupManager::getSingleton().listResourceNames("Models");
 		if (objectType == "Item") {
 			int flags = 0;
@@ -232,6 +243,28 @@ void GameObjectEditor::Update()
 							node->attachObject(OgreUtils::loadMesh(selectedMeshName, mgr.get()));
 						});
 						meshName = selectedMeshName;
+					}
+				}
+				ImGui::EndCombo();
+			}
+
+			auto it = node->getAttachedObjectIterator();
+			auto obj = it.getNext();
+			item = dynamic_cast<Ogre::Item*>(obj);
+			const Ogre::String* matname = item->getSubItem(0)->getDatablock()->getNameStr();
+
+			if (ImGui::BeginCombo("Material", (*matname).c_str(), flags))
+			{
+				for (auto iter = dtmap.begin(); iter != dtmap.end(); ++iter)
+				{
+					auto selectedMatIdString = iter->first;
+					auto datablock = iter->second.datablock;
+					auto selectedMatName = datablock->getNameStr();
+					if (ImGui::Selectable((*selectedMatName).c_str())) {
+						node->getUserObjectBindings().setUserAny("materialName", Ogre::Any(std::string((*selectedMatName).c_str())));
+						m_pRenderEngine->GetRT()->RC_LambdaAction([i = item, selectedMatName]{
+							i->setDatablock(Ogre::IdString((*selectedMatName).c_str()));
+						});
 					}
 				}
 				ImGui::EndCombo();
