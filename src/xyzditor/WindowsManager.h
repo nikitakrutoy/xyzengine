@@ -8,11 +8,12 @@ public:
 	WindowsManager(RenderEngine* renderEngine);
 	void Update();
 	void ProcessInput();
-	std::vector<EditorWindow*> GetWindows() { return { m_pSceneTreeWindow, m_pGameObjectEditor, m_pDemoWindow }; };
+	std::vector<EditorWindow*> GetWindows() { return { m_pSceneTreeWindow, m_pGameObjectEditor, m_pDemoWindow, m_CameraWindow }; };
 
 private:
 	SceneTreeWindow* m_pSceneTreeWindow;
 	GameObjectEditor* m_pGameObjectEditor;
 	DemoWindow* m_pDemoWindow;
+	CameraWindow* m_CameraWindow;
 };
 

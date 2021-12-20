@@ -27,6 +27,8 @@ protected:
 	ImGuiContext* m_pImGuiContext;
 	SDL_Window* m_SDL_Window;
 	SDL_GLContext m_GL_Context;
+	void StartFrame();
+	void EndFrame();
 
 protected:
 	RenderEngine* m_pRenderEngine;
@@ -84,3 +86,13 @@ public:
 
 };
 
+
+class CameraWindow : public EditorWindow
+{
+public:
+	CameraWindow(RenderEngine* renderEngine, std::string name, size_t width = 400, size_t height = 200) : EditorWindow(renderEngine, name, width, height) {
+	};
+	~CameraWindow() {};
+	void Update() override;;
+
+};

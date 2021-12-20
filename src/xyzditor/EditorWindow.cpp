@@ -57,6 +57,23 @@ EditorWindow::~EditorWindow()
 	SDL_DestroyWindow(m_SDL_Window);
 }
 
+void EditorWindow::StartFrame()
+{
+	ImGui::SetCurrentContext(m_pImGuiContext);
+	SDL_GL_MakeCurrent(m_SDL_Window, m_GL_Context);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+	ImGui::NewFrame();
+}
+
+void EditorWindow::EndFrame()
+{
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	SwapFrames();
+}
+
 void SceneTreeWindow::AddObject(Ogre::SceneNode* node) {
 	if (ImGui::Button("Add Empty", ImVec2(100, 20)))
 	{
@@ -94,15 +111,7 @@ void SceneTreeWindow::AddObject(Ogre::SceneNode* node) {
 
 void SceneTreeWindow::Update()
 {
-	ImGui::SetCurrentContext(m_pImGuiContext);
-	SDL_GL_MakeCurrent(m_SDL_Window, m_GL_Context);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplSDL2_NewFrame();
-	ImGui::NewFrame();
+	StartFrame();
 	{
 		ImGui::SetNextWindowSize(ImVec2(width, height));
 		ImGui::SetNextWindowPos(ImVec2(0, 0));
@@ -130,9 +139,7 @@ void SceneTreeWindow::Update()
 		DrawSceneTree(m_pRenderEngine->GetSceneManager()->getRootSceneNode());
 		ImGui::End();
 	}
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	SwapFrames();
+	EndFrame();
 }
 
 void SceneTreeWindow::DrawSceneTree(Ogre::SceneNode* node)
@@ -161,13 +168,7 @@ void SceneTreeWindow::DrawSceneTree(Ogre::SceneNode* node)
 
 void GameObjectEditor::Update()
 {
-	ImGui::SetCurrentContext(m_pImGuiContext);
-	SDL_GL_MakeCurrent(m_SDL_Window, m_GL_Context);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplSDL2_NewFrame();
-	ImGui::NewFrame();
-
+	StartFrame();
 	auto node = m_pSelectedNode;
 	ImGui::SetNextWindowSize(ImVec2(width, height));
 	ImGui::SetNextWindowPos(ImVec2(0, 0));
@@ -268,9 +269,7 @@ void GameObjectEditor::Update()
 	}
 	ImGui::End();
 
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	SwapFrames();
+	EndFrame();
 }
 
 void GameObjectEditor::SetSelected(Ogre::SceneNode* node)
@@ -305,14 +304,37 @@ void GameObjectEditor::SetSelected(Ogre::SceneNode* node)
 }
 
  void DemoWindow::Update() {
-	ImGui::SetCurrentContext(m_pImGuiContext);
-	SDL_GL_MakeCurrent(m_SDL_Window, m_GL_Context);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplSDL2_NewFrame();
-	ImGui::NewFrame();
+	StartFrame();
 	ImGui::ShowDemoWindow();
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	SwapFrames();
+	EndFrame();
 }
+
+ void CameraWindow::Update()
+ {
+	 StartFrame();
+	 ImGui::SetNextWindowSize(ImVec2(width, height));
+	 ImGui::SetNextWindowPos(ImVec2(0, 0));
+	 ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse;
+	 ImGui::Begin("Camera", (bool*)0, window_flags);
+	 auto cam = m_pRenderEngine->GetMainCamera();
+	 auto pos = cam->getPosition();
+	 ImGui::DragFloat3("Position", &pos.x, 0.05f);
+	 m_pRenderEngine->GetRT()->RC_LambdaAction([cam, pos] {
+		 cam->setPosition(pos);
+		 });
+
+	 auto fclip = cam->getFarClipDistance();
+	 ImGui::DragFloat("Far Clip Distance", &fclip, 0.05f);
+	 m_pRenderEngine->GetRT()->RC_LambdaAction([cam, fclip] {
+		 cam->setFarClipDistance(fclip > 0.1 ? fclip : 0.1);
+	});
+
+	 auto nclip = cam->getNearClipDistance();
+	 ImGui::DragFloat("Near Clip Distance", &nclip, 0.05f);
+	 m_pRenderEngine->GetRT()->RC_LambdaAction([cam, nclip] {
+		 cam->setNearClipDistance(nclip > 0.1 ? nclip : 0.1);
+	});
+
+	 ImGui::End();
+	 EndFrame();
+ }

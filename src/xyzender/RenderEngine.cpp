@@ -101,11 +101,9 @@ void RenderEngine::RT_Init()
 	params["externalGLControl"] = Ogre::String("True");
 
 	m_pRenderWindow = std::unique_ptr<Ogre::Window>(Ogre::Root::getSingleton().createRenderWindow(sTitleName, width, height, false, &params));
-
 	// Scene manager
 	m_pSceneManager = std::unique_ptr<Ogre::SceneManager>(m_pRoot->createSceneManager(Ogre::SceneType::ST_GENERIC, 2));
 	m_pSceneManager->setForward3D(true, 4, 4, 5, 96, 3, 200);
-
 }
 
 void RenderEngine::RT_SetupDefaultCamera()
@@ -115,7 +113,7 @@ void RenderEngine::RT_SetupDefaultCamera()
 	m_pCamera->lookAt(Ogre::Vector3(0, 0, 0));
 	m_pCamera->setNearClipDistance(0.2f);
 	m_pCamera->setFarClipDistance(1000.0f);
-	m_pCamera->setAutoAspectRatio(true);
+	m_pCamera->setAutoAspectRatio(false);
 	m_pCamera->setFixedYawAxis(true);
 }
 
@@ -127,7 +125,7 @@ void RenderEngine::RT_SetupDefaultCompositor()
 
 	if (!compositorManager->hasWorkspaceDefinition(workspaceName))
 	{
-		compositorManager->createBasicWorkspaceDef(workspaceName, Ogre::ColourValue::Blue);
+		compositorManager->createBasicWorkspaceDef(workspaceName, Ogre::ColourValue(0.5, 0.5, 0.5, 1.0));
 	}
 
 	m_pWorkspace = std::unique_ptr<Ogre::CompositorWorkspace>
@@ -144,61 +142,6 @@ void RenderEngine::RT_LoadDefaultScene() {
 	auto scenesPath = Ogre::ResourceGroupManager::getSingleton().listResourceLocations("Scenes")->at(0);
 	scenesPath += "/default.json";
 	SceneLoader::LoadJSON(m_pSceneManager.get(), nullptr, scenesPath);
-}
-
-void RenderEngine::RT_LoadOgreHead()
-{
-	//Load the v1 mesh. Notice the v1 namespace
-//Also notice the HBU_STATIC flag; since the HBU_WRITE_ONLY
-//bit would prohibit us from reading the data for importing.
-	Ogre::v1::MeshPtr v1Mesh;
-	Ogre::MeshPtr v2Mesh;
-
-
-	v1Mesh = Ogre::v1::MeshManager::getSingleton().load(
-		"ogrehead.mesh", Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
-		Ogre::v1::HardwareBuffer::HBU_STATIC, Ogre::v1::HardwareBuffer::HBU_STATIC);
-
-	//Create a v2 mesh to import to, with a different name (arbitrary).
-	v2Mesh = Ogre::MeshManager::getSingleton().createManual(
-		"ogrehead.mesh", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-
-	bool halfPosition = true;
-	bool halfUVs = true;
-	bool useQtangents = true;
-
-	//Import the v1 mesh to v2
-	v2Mesh->importV1(v1Mesh.get(), halfPosition, halfUVs, useQtangents);
-
-	//We don't need the v1 mesh. Free CPU memory, get it out of the GPU.
-	//Leave it loaded if you want to use athene with v1 Entity.
-	v1Mesh->unload();
-
-	//Create an Item with the model we just imported.
-	//Notice we use the name of the imported model. We could also use the overload
-	//with the mesh pointer:
-	Ogre::Item* item = m_pSceneManager->createItem("ogrehead.mesh",
-		Ogre::ResourceGroupManager::
-		AUTODETECT_RESOURCE_GROUP_NAME,
-		Ogre::SCENE_DYNAMIC);
-	item->setName("ogrehead.mesh");
-	Ogre::SceneNode* sceneNode = m_pSceneManager->getRootSceneNode(Ogre::SCENE_DYNAMIC)->
-		createChildSceneNode(Ogre::SCENE_DYNAMIC);
-	sceneNode->attachObject(item);
-	sceneNode->scale(1.f, 1.0f, 1.0f);
-	sceneNode->setName("Ogre");
-}
-
-void RenderEngine::RT_SetupDefaultLight()
-{
-	// Lightning
-	Ogre::Light* light = m_pSceneManager->createLight();
-	Ogre::SceneNode* lightNode = m_pSceneManager->getRootSceneNode()->createChildSceneNode();
-	lightNode->setName("light2");
-	lightNode->attachObject(light);
-	light->setPowerScale(Ogre::Math::PI); //Since we don't do HDR, counter the PBS' division by PI
-	light->setType(Ogre::Light::LT_DIRECTIONAL);
-	light->setDirection(Ogre::Vector3(-1, -1, -1).normalisedCopy());
 }
 
 void RenderEngine::RT_EndInit()

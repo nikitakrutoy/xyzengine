@@ -9,6 +9,7 @@ WindowsManager::WindowsManager(RenderEngine* renderEngine)
 	m_pGameObjectEditor = new GameObjectEditor(renderEngine, "Property Editor");
 	m_pSceneTreeWindow = new SceneTreeWindow(renderEngine, "Scene Tree");
 	m_pDemoWindow = new DemoWindow(renderEngine, "Demo");
+	m_CameraWindow = new CameraWindow(renderEngine, "Camera Settings");
 }
 
 void WindowsManager::Update()
@@ -17,6 +18,7 @@ void WindowsManager::Update()
 	m_pGameObjectEditor->SetSelected(m_pSceneTreeWindow->GetSelected());
 	m_pGameObjectEditor->Update();
 	m_pDemoWindow->Update();
+	m_CameraWindow->Update();
 }
 
 void WindowsManager::ProcessInput()
