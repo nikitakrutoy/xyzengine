@@ -1,0 +1,114 @@
+{
+    "cameraData": {
+        "direction": [
+            -0.8304283618927002,
+            -0.0601981058716774,
+            -0.5538637042045593
+        ],
+        "far": 2000.0,
+        "near": 0.20000000298023224,
+        "position": [
+            448.993408203125,
+            -10.109699249267578,
+            275.16583251953125
+        ]
+    },
+    "objects": [
+        {
+            "direction": [
+                -0.5773502588272095,
+                -0.5773502588272095,
+                -0.5773502588272095
+            ],
+            "lightType": 0,
+            "name": "light2",
+            "objects": [],
+            "position": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "scriptName": "CameraController.lua",
+            "type": "Light",
+            "visible": true
+        },
+        {
+            "materialName": "cornell_leftWall",
+            "meshName": "ogrehead.mesh",
+            "name": "Ogre2",
+            "objects": [
+                {
+                    "materialName": "pattern",
+                    "meshName": "knot.mesh",
+                    "name": "OgreChild",
+                    "objects": [],
+                    "position": [
+                        23.9950008392334,
+                        0.42500001192092896,
+                        0.0
+                    ],
+                    "scale": [
+                        0.7749999761581421,
+                        0.5450000166893005,
+                        0.6800000071525574
+                    ],
+                    "scriptName": "Default.lua",
+                    "type": "Item",
+                    "visible": true
+                }
+            ],
+            "position": [
+                -3.818000078201294,
+                -10.0,
+                10.0
+            ],
+            "scale": [
+                2.364000082015991,
+                1.0,
+                1.0
+            ],
+            "scriptName": "Actor.lua",
+            "type": "Item",
+            "visible": true
+        },
+        {
+            "materialName": "Skybox",
+            "meshName": "Skybox.mesh",
+            "name": "SkyBox",
+            "objects": [],
+            "position": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                500.0,
+                500.0,
+                500.0
+            ],
+            "scriptName": "Default.lua",
+            "type": "Item",
+            "visible": true
+        },
+        {
+            "name": "CameraController",
+            "objects": [],
+            "position": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "scriptName": "CameraController.lua"
+        }
+    ]
+}

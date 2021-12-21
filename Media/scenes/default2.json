@@ -1,0 +1,46 @@
+{
+    "objects": [
+        {
+            "direction": [
+                -0.5773502588272095,
+                -0.5773502588272095,
+                -0.5773502588272095
+            ],
+            "lightType": 0,
+            "name": "light2",
+            "objects": [],
+            "position": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "scriptName": "Actor.lua",
+            "type": "Light",
+            "visible": true
+        },
+        {
+            "materialName": "pattern",
+            "meshName": "ogrehead.mesh",
+            "name": "Ogre2",
+            "objects": [],
+            "position": [
+                -0.6869999766349792,
+                -0.39500001072883606,
+                32.53499984741211
+            ],
+            "scale": [
+                2.364000082015991,
+                0.5049999952316284,
+                1.0
+            ],
+            "scriptName": "Pawn.lua",
+            "type": "Item",
+            "visible": true
+        }
+    ]
+}
