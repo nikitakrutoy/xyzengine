@@ -91,6 +91,15 @@ void SceneLoader::StoreJSON(Ogre::SceneManager* sceneManager, std::string path)
 	json d = json::object();
 	d["objects"] = json::array();
 	StoreObjects(d["objects"], sceneManager->getRootSceneNode());
+	auto cameraData = json::object();
+	auto camera = sceneManager->getCameras().at(0);
+	auto position = camera->getPosition();
+	auto dir = camera->getDirection();
+	cameraData["position"] = json::array({ position.x, position.y, position.z });
+	cameraData["direction"] = json::array({ dir.x, dir.y, dir.z });
+	cameraData["far"] = camera->getFarClipDistance();
+	cameraData["near"] = camera->getNearClipDistance();
+	d["cameraData"] = cameraData;
 	std::ofstream o(path);
 	o << std::setw(4) << d << std::endl;
 }
@@ -98,20 +107,38 @@ void SceneLoader::StoreJSON(Ogre::SceneManager* sceneManager, std::string path)
 void SceneLoader::LoadJSON(Ogre::SceneManager* sceneManager, EntityManager* entityManager, std::string path)
 {
 	sceneManager->clearScene(true);
-	auto cameraIter = sceneManager->getCameraIterator();
-	while (cameraIter.hasMoreElements()) {
-		auto m_pCamera = cameraIter.getNext();
-		m_pCamera->setPosition(Ogre::Vector3(150, 0, 0));
-		m_pCamera->lookAt(Ogre::Vector3(0, 0, 0));
-		m_pCamera->setNearClipDistance(0.2f);
-		m_pCamera->setFarClipDistance(1000.0f);
-		m_pCamera->setAutoAspectRatio(true);
-		m_pCamera->setFixedYawAxis(true);
-	}
 
 	std::ifstream i(path);
 	json j;
 	i >> j;
+
+	auto cameraIter = sceneManager->getCameraIterator();
+	if (j.find("cameraData") != j.end()) {
+		while (cameraIter.hasMoreElements()) {
+			auto cameraData = j["cameraData"];
+			auto m_pCamera = cameraIter.getNext();
+			auto pos = cameraData["position"];
+			auto dir = cameraData["direction"];
+			m_pCamera->setPosition(Ogre::Vector3(pos[0], pos[1], pos[2]));
+			m_pCamera->setDirection(Ogre::Vector3(dir[0], dir[1], dir[2]));
+			m_pCamera->setNearClipDistance(cameraData["near"]);
+			m_pCamera->setFarClipDistance(cameraData["far"]);
+			m_pCamera->setAutoAspectRatio(false);
+			m_pCamera->setFixedYawAxis(true);
+		}
+	}
+	else {
+		while (cameraIter.hasMoreElements()) {
+			auto m_pCamera = cameraIter.getNext();
+			m_pCamera->setPosition(150, 0, 0);
+			m_pCamera->lookAt(0, 0, 0);
+			m_pCamera->setNearClipDistance(0.2);
+			m_pCamera->setFarClipDistance(2000);
+			m_pCamera->setAutoAspectRatio(false);
+			m_pCamera->setFixedYawAxis(true);
+		}
+	}
+
 	
 	LoadObjects(j, sceneManager, entityManager);
 }

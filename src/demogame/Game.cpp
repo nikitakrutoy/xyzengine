@@ -34,7 +34,7 @@ Game::Game()
 		m_pRenderEngine->RT_LoadDefaultResources();
 		auto scenesPath = Ogre::ResourceGroupManager::getSingleton().listResourceLocations("Scenes")->at(0);
 		scenesPath += "/default.json";
-		SceneLoader::LoadJSON2ECS(m_pRenderEngine->GetSceneManager().get(), m_pEntityManager, scenesPath);
+		SceneLoader::LoadJSON(m_pRenderEngine->GetSceneManager().get(), m_pEntityManager, scenesPath);
 		m_pRenderEngine->RT_EndInit();
 		});
 	m_pRenderEngine->GetRT()->RC_EndFrame();
