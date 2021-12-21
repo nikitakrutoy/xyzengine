@@ -47,9 +47,9 @@ void StoreObjects(json& d, Ogre::SceneNode* node) {
 }
 
 
-void LoadObjects(json& j, Ogre::SceneManager* sceneManager, EntityManager* entityManager) {
+void LoadObjects(json& j, Ogre::SceneManager* sceneManager, EntityManager* entityManager, Ogre::SceneNode* node) {
 	for (auto obj : j["objects"]) {
-		Ogre::SceneNode* sceneNode = sceneManager->getRootSceneNode(Ogre::SCENE_DYNAMIC)->
+		Ogre::SceneNode* sceneNode = node->
 			createChildSceneNode(Ogre::SCENE_DYNAMIC);
 		sceneNode->setName(obj["name"]);
 		auto position = obj["position"];
@@ -82,7 +82,7 @@ void LoadObjects(json& j, Ogre::SceneManager* sceneManager, EntityManager* entit
 
 		if (obj.find("scriptName") != obj.end() && entityManager)
 			entityManager->CreateEntity(sceneNode, obj["scriptName"]);
-		LoadObjects(obj, sceneManager, entityManager);
+		LoadObjects(obj, sceneManager, entityManager, sceneNode);
 	}
 }
 
@@ -140,5 +140,5 @@ void SceneLoader::LoadJSON(Ogre::SceneManager* sceneManager, EntityManager* enti
 	}
 
 	
-	LoadObjects(j, sceneManager, entityManager);
+	LoadObjects(j, sceneManager, entityManager, sceneManager->getRootSceneNode(Ogre::SCENE_DYNAMIC));
 }

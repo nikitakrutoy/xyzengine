@@ -253,25 +253,29 @@ void GameObjectEditor::Update()
 			}
 
 			auto it = node->getAttachedObjectIterator();
-			auto obj = it.getNext();
-			item = dynamic_cast<Ogre::Item*>(obj);
-			const Ogre::String* matname = item->getSubItem(0)->getDatablock()->getNameStr();
-
-			if (ImGui::BeginCombo("Material", (*matname).c_str(), flags))
-			{
-				for (auto iter = dtmap.begin(); iter != dtmap.end(); ++iter)
+			const Ogre::String* matname{};
+			while (it.hasMoreElements()) {
+				auto obj = it.getNext();
+				item = dynamic_cast<Ogre::Item*>(obj);
+				matname = item->getSubItem(0)->getDatablock()->getNameStr();
+			}
+			if (matname) {
+				if (ImGui::BeginCombo("Material", (*matname).c_str(), flags))
 				{
-					auto selectedMatIdString = iter->first;
-					auto datablock = iter->second.datablock;
-					auto selectedMatName = datablock->getNameStr();
-					if (ImGui::Selectable((*selectedMatName).c_str())) {
-						SceneLoader::getNodeMaterials()[node] = std::string((*selectedMatName).c_str());
-						m_pRenderEngine->GetRT()->RC_LambdaAction([i = item, selectedMatName]{
-							i->setDatablock(Ogre::IdString((*selectedMatName).c_str()));
-						});
+					for (auto iter = dtmap.begin(); iter != dtmap.end(); ++iter)
+					{
+						auto selectedMatIdString = iter->first;
+						auto datablock = iter->second.datablock;
+						auto selectedMatName = datablock->getNameStr();
+						if (ImGui::Selectable((*selectedMatName).c_str())) {
+							SceneLoader::getNodeMaterials()[node] = std::string((*selectedMatName).c_str());
+							m_pRenderEngine->GetRT()->RC_LambdaAction([i = item, selectedMatName] {
+								i->setDatablock(Ogre::IdString((*selectedMatName).c_str()));
+								});
+						}
 					}
+					ImGui::EndCombo();
 				}
-				ImGui::EndCombo();
 			}
 		}
 		if (objectType == "Light") {
