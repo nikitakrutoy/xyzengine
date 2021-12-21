@@ -16,20 +16,15 @@ public:
 	~Script();
 
 	void Update(float dt);
-	void ReloadScript();
-
-	void InitTransform(Transform transform);
-
 	void Initialize();
-
+	void ReloadScript();
 	void GetComponents(flecs::entity& ent);
 
-	void SetTransform(Transform transform);
+	void InitTransform(Transform transform, std::string name = "Transform");
+	void SetTransform(Transform transform, std::string name = "Transform");
+	Transform GetTransform(std::string name = "Transform");
 
-	Transform GetTransform();
 
-	Ogre::Vector3 GetCameraPosition() const;
-	Ogre::Quaternion GetOrientation() const;
 	bool GetIsStatic() const;
 
 private:
@@ -46,15 +41,10 @@ private:
 	const char* m_EntityFieldName = "Entity";
 	const char* m_PropertiesFieldName = "Properties";
 	const char* m_ControllableFieldName = "Controllable";
-	const char* m_CameraFieldName = "Camera";
 	const char* m_NameFieldName = "Name";
 	const char* m_ParametersFieldName = "Parameters";
 	const char* m_StaticsFieldName = "IsStatic";
 
-	const char* m_GetCameraPositionFunctionName = "GetCameraPosition";
-	const char* m_GetCameraOffsetFunctionName = "GetCameraOffset";
-	const char* m_SetCameraOffsetFunctionName = "SetCameraOffset";
-	const char* m_GetOrientationFunctionName = "GetOrientation";
 	const char* m_OnInitFunctionName = "OnInit";
 	const char* m_OnUpdateFunctionName = "OnUpdate";
 };

@@ -126,6 +126,7 @@ void SceneTreeWindow::Update()
 
 		ImGui::InputText("Scene name", sceneName, IM_ARRAYSIZE(sceneName));
 		if (ImGui::Button("Save", ImVec2(100, 20))) {
+			m_pSelectedNode = nullptr;
 			auto scenePath = Ogre::ResourceGroupManager::getSingleton().listResourceLocations("Scenes")->at(0);
 			scenePath += "/" + std::string(sceneName);
 			SceneLoader::StoreJSON(m_pRenderEngine->GetSceneManager().get(), scenePath);
@@ -216,12 +217,15 @@ void GameObjectEditor::Update()
 			{
 				std::string selectedScriptName = scripts->at(n);
 				if (ImGui::Selectable(selectedScriptName.c_str()) && !selectedScriptName.empty()) {
-					node->getUserObjectBindings().setUserAny("scriptName", Ogre::Any(selectedScriptName));
+					SceneLoader::getNodeScripts()[node] = selectedScriptName;
 					scriptName = selectedScriptName;
 				}
 			}
 			ImGui::EndCombo();
 		}
+
+
+		ImGui::Text("Object Type"); ImGui::SameLine(); ImGui::Text(objectType.c_str());
 
 		Ogre::Hlms* hlmsPbs = Ogre::Root::getSingleton().getHlmsManager()->getHlms(Ogre::HLMS_PBS);
 		Ogre::Hlms* hlmsUnlit = Ogre::Root::getSingleton().getHlmsManager()->getHlms(Ogre::HLMS_UNLIT);
@@ -261,7 +265,7 @@ void GameObjectEditor::Update()
 					auto datablock = iter->second.datablock;
 					auto selectedMatName = datablock->getNameStr();
 					if (ImGui::Selectable((*selectedMatName).c_str())) {
-						node->getUserObjectBindings().setUserAny("materialName", Ogre::Any(std::string((*selectedMatName).c_str())));
+						SceneLoader::getNodeMaterials()[node] = std::string((*selectedMatName).c_str());
 						m_pRenderEngine->GetRT()->RC_LambdaAction([i = item, selectedMatName]{
 							i->setDatablock(Ogre::IdString((*selectedMatName).c_str()));
 						});
@@ -316,8 +320,8 @@ void GameObjectEditor::SetSelected(Ogre::SceneNode* node)
 		auto bindigns = node->getUserObjectBindings();
 		auto script = bindigns.getUserAny("scriptName");
 		objectType = "Empty";
-		if (!script.isEmpty())
-			scriptName = Ogre::any_cast<std::string>(script);
+		if (SceneLoader::getNodeScripts().find(node) != SceneLoader::getNodeScripts().end())
+			scriptName = SceneLoader::getNodeScripts()[node];
 		else
 			scriptName = std::string();
 		while (objects.hasMoreElements()) {

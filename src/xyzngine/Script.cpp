@@ -44,38 +44,14 @@ void Script::GetComponents(flecs::entity& ent) {
 		ent.add<Controllable>();
 }
 
-void Script::SetTransform(Transform transform) {
+void Script::SetTransform(Transform transform, std::string name) {
 	luabridge::LuaRef object = luabridge::getGlobal(m_script, m_EntityFieldName);
-	object["Transform"] = transform;
+	object[name] = transform;
 }
 
-Transform Script::GetTransform() {
-	luabridge::LuaRef object = luabridge::getGlobal(m_script, "Transform");
+Transform Script::GetTransform(std::string name) {
+	luabridge::LuaRef object = luabridge::getGlobal(m_script, name.c_str());
 	return object.cast<Transform>();;
-}
-
-Ogre::Vector3 Script::GetCameraPosition() const
-{
-	luabridge::LuaRef object = luabridge::getGlobal(m_script, m_EntityFieldName);
-
-	luabridge::LuaResult cameraPosition = object[m_GetCameraPositionFunctionName]();
-	assert(cameraPosition.wasOk());
-
-	Ogre::Vector3 vPosition = cameraPosition[0].cast<Ogre::Vector3>();
-
-	return vPosition;
-}
-
-Ogre::Quaternion Script::GetOrientation() const
-{
-	luabridge::LuaRef object = luabridge::getGlobal(m_script, m_EntityFieldName);
-
-	luabridge::LuaResult orientation = object[m_GetOrientationFunctionName]();
-	assert(orientation.wasOk());
-
-	Ogre::Quaternion vOrientation = orientation[0].cast<Ogre::Quaternion>();
-
-	return vOrientation;
 }
 
 void Script::ReloadScript()
@@ -109,17 +85,19 @@ void Script::ReloadScript()
 	}
 }
 
-void Script::InitTransform(Transform transform) {
+void Script::InitTransform(Transform transform, std::string name) {
 	if (!m_isTransformIntialized) {
 		std::error_code ec;
 		luabridge::push(m_script, transform, ec);
-		lua_setglobal(m_script, "Transform");
+		lua_setglobal(m_script, name.c_str());
 		m_isTransformIntialized = true;
 	}
 	else {
 		SetTransform(transform);
 	}
 }
+
+
 
 bool Script::GetIsStatic() const
 {
@@ -136,6 +114,8 @@ void Script::AddDependencies(lua_State* L)
 		.beginClass<InputHandler>("InputHandler")
 		.addConstructor<void(*) (const std::string&)>()
 		.addFunction("isCommandActive", &InputHandler::GetCommand)
+		.addFunction("GetMouseDiffX", &InputHandler::GetMouseDiffX)
+		.addFunction("GetMouseDiffY", &InputHandler::GetMouseDiffY)
 		.endClass()
 		.beginClass<Transform>("Transform")
 		.addConstructor<void(*) (const Ogre::Vector3&, const Ogre::Vector3&, const Ogre::Quaternion&)>()

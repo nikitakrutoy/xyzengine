@@ -35,7 +35,6 @@ public:
 	bool GetQuit() { return m_bQuit; }
 	void SetQuit(bool bQuit) { m_bQuit = bQuit; }
 
-
 	Ogre::SceneNode* GetRootNode() { return m_pSceneManager->getRootSceneNode(); };
 	std::shared_ptr<Ogre::SceneManager> GetSceneManager() { return m_pSceneManager; };
 	SDL_Window* GetWindow() { return m_SDL_Window; };

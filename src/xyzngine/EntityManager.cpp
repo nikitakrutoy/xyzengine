@@ -20,7 +20,14 @@ void EntityManager::CreateEntity(Ogre::SceneNode* sceneNode, std::string strScri
 		sceneNode->getScale(),
 		sceneNode->getOrientation()
 	};
-	pScript->InitTransform(transform);
+	auto cam = sceneNode->getCreator()->getCameras().at(0);
+	Transform camTransform = Transform{
+		cam->getPosition(),
+		Ogre::Vector3::ZERO,
+		cam->getOrientation()
+	};
+	pScript->InitTransform(transform, "Transform");
+	pScript->InitTransform(camTransform, "CameraTransform");
 	pScript->Initialize();
 	pScript->GetComponents(newEntity);
 

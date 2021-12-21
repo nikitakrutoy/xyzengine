@@ -17,9 +17,9 @@ void StoreObjects(json& d, Ogre::SceneNode* node) {
 		auto scale = child->getScale();
 		childObj["position"] = json::array({ position.x, position.y, position.z });
 		childObj["scale"] = json::array({ scale.x, scale.y, scale.z });
-		auto scriptName = child->getUserObjectBindings().getUserAny("scriptName");
-		if (!scriptName.isEmpty())
-			childObj["scriptName"] = Ogre::any_cast<std::string>(scriptName);
+		if (SceneLoader::getNodeScripts().find(child) != SceneLoader::getNodeScripts().end())
+			childObj["scriptName"] = SceneLoader::getNodeScripts()[child];
+			
 		Ogre::SceneNode::ObjectIterator iter = child->getAttachedObjectIterator();
 		while (iter.hasMoreElements()) {
 			Ogre::MovableObject* movObj = iter.getNext();
@@ -29,9 +29,12 @@ void StoreObjects(json& d, Ogre::SceneNode* node) {
 			if (childObj["type"] == "Item") {
 				Ogre::Item* item = dynamic_cast<Ogre::Item*>(movObj);
 				childObj["meshName"] = item->getName();
-				auto materialName = child->getUserObjectBindings().getUserAny("materialName");
-				if (!materialName.isEmpty())
-					childObj["materialName"] = Ogre::any_cast<std::string>(materialName);
+
+				if (SceneLoader::getNodeMaterials().find(child) != SceneLoader::getNodeMaterials().end())
+					childObj["materialName"] = SceneLoader::getNodeMaterials()[child];
+				//auto materialName = child->getUserObjectBindings().getUserAny("materialName");
+				//if (!materialName.isEmpty())
+				//	childObj["materialName"] = Ogre::any_cast<std::string>(materialName);
 			}
 			if (childObj["type"] == "Light") {
 				Ogre::Light* light = dynamic_cast<Ogre::Light*>(movObj);
@@ -62,8 +65,10 @@ void LoadObjects(json& j, Ogre::SceneManager* sceneManager, EntityManager* entit
 			Ogre::Item* item = OgreUtils::loadMesh(obj["meshName"], sceneManager);
 
 			item->setName(obj["meshName"]);
-			if(obj.find("materialName") != obj.end())
+			if (obj.find("materialName") != obj.end()) {
 				item->setDatablock(obj["materialName"]);
+				SceneLoader::getNodeMaterials()[sceneNode] = obj["materialName"];
+			};
 			sceneNode->attachObject(item);
 		}
 
@@ -75,6 +80,9 @@ void LoadObjects(json& j, Ogre::SceneManager* sceneManager, EntityManager* entit
 			auto dir = obj["direction"];
 			light->setDirection(Ogre::Vector3(dir[0], dir[1], dir[2]));
 		}
+		if (obj.find("scriptName") != obj.end())
+			SceneLoader::getNodeScripts()[sceneNode] = obj["scriptName"];
+
 		if (obj.find("scriptName") != obj.end() && entityManager)
 			entityManager->CreateEntity(sceneNode, obj["scriptName"]);
 		LoadObjects(obj, sceneManager, entityManager);
