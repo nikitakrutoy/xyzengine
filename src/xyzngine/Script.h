@@ -40,7 +40,7 @@ private:
 
 	const char* m_EntityFieldName = "Entity";
 	const char* m_PropertiesFieldName = "Properties";
-	const char* m_ControllableFieldName = "Controllable";
+	const char* m_CameraControllerFieldName = "CameraController";
 	const char* m_NameFieldName = "Name";
 	const char* m_ParametersFieldName = "Parameters";
 	const char* m_StaticsFieldName = "IsStatic";

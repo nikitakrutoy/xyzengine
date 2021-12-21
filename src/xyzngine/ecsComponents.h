@@ -3,7 +3,7 @@
 #include "Script.h"
 #include "ScriptManager.h"
 #include "RenderEngine.h"
-struct Controllable {};
+struct CameraController {};
 
 struct InputHandlerPtr
 {

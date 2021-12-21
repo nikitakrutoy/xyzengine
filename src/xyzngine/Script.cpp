@@ -34,14 +34,14 @@ void Script::Initialize() {
 void Script::GetComponents(flecs::entity& ent) {
 	luabridge::LuaRef object = luabridge::getGlobal(m_script, m_EntityFieldName);
 	luabridge::LuaRef properties = object[m_PropertiesFieldName];
-	luabridge::LuaRef controllable = properties[m_ControllableFieldName];
+	luabridge::LuaRef cameraController = properties[m_CameraControllerFieldName];
 
-	bool bControllable = controllable.cast<bool>();
+	bool bCameraController = cameraController.cast<bool>();
 
 	ent.set_name(properties[m_NameFieldName].cast<std::string>().c_str());
 
-	if (bControllable)
-		ent.add<Controllable>();
+	if (bCameraController)
+		ent.add<CameraController>();
 }
 
 void Script::SetTransform(Transform transform, std::string name) {
@@ -86,15 +86,10 @@ void Script::ReloadScript()
 }
 
 void Script::InitTransform(Transform transform, std::string name) {
-	if (!m_isTransformIntialized) {
-		std::error_code ec;
-		luabridge::push(m_script, transform, ec);
-		lua_setglobal(m_script, name.c_str());
-		m_isTransformIntialized = true;
-	}
-	else {
-		SetTransform(transform);
-	}
+	std::error_code ec;
+	luabridge::push(m_script, transform, ec);
+	lua_setglobal(m_script, name.c_str());
+	m_isTransformIntialized = true;
 }
 
 
@@ -114,6 +109,7 @@ void Script::AddDependencies(lua_State* L)
 		.beginClass<InputHandler>("InputHandler")
 		.addConstructor<void(*) (const std::string&)>()
 		.addFunction("isCommandActive", &InputHandler::GetCommand)
+		.addFunction("GetMouse", &InputHandler::GetMouse)
 		.addFunction("GetMouseDiffX", &InputHandler::GetMouseDiffX)
 		.addFunction("GetMouseDiffY", &InputHandler::GetMouseDiffY)
 		.endClass()
@@ -139,6 +135,7 @@ void Script::AddDependencies(lua_State* L)
 		.addConstructor<void(*) (const Ogre::Radian&, const Ogre::Vector3&)>()
 		.addFunction("setOrientation", &(Ogre::Quaternion::FromAngleAxis))
 		.addFunction("__mul", (Ogre::Vector3(Ogre::Quaternion::*)(const Ogre::Vector3&) const) & Ogre::Quaternion::operator*)
+		.addFunction("__add", (Ogre::Quaternion(Ogre::Quaternion::*)(const Ogre::Quaternion&) const) & Ogre::Quaternion::operator*)
 		.endClass();
 
 	luabridge::push(L, m_pInputHandler, ec);

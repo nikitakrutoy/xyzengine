@@ -32,9 +32,6 @@ void StoreObjects(json& d, Ogre::SceneNode* node) {
 
 				if (SceneLoader::getNodeMaterials().find(child) != SceneLoader::getNodeMaterials().end())
 					childObj["materialName"] = SceneLoader::getNodeMaterials()[child];
-				//auto materialName = child->getUserObjectBindings().getUserAny("materialName");
-				//if (!materialName.isEmpty())
-				//	childObj["materialName"] = Ogre::any_cast<std::string>(materialName);
 			}
 			if (childObj["type"] == "Light") {
 				Ogre::Light* light = dynamic_cast<Ogre::Light*>(movObj);
