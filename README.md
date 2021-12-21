@@ -19,6 +19,7 @@
 
 # Editor
 * Scene tree
+* Camera settings
 * Add or delete object (empty, mesh, light)
 * Object property editor
   * Transforms
